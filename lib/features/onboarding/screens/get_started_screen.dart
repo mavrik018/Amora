@@ -1,4 +1,5 @@
 // Get Started screen
+import 'package:amora/features/auth/screens/login_screen.dart';
 import 'package:amora/features/onboarding/widgets/cta_button.dart';
 import 'package:amora/features/onboarding/widgets/profile_card.dart';
 import 'package:flutter/material.dart';
@@ -100,7 +101,13 @@ class GetStartedScreen extends StatelessWidget {
                   const CtaButton(),
                   10.verticalSpace,
                   TextButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (context) => const LoginScreen(),
+                        ),
+                      );
+                    },
                     child: Text(
                       "LOG IN",
                       style: Theme.of(
