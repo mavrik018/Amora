@@ -1,0 +1,1 @@
+// Swipe Stack widget

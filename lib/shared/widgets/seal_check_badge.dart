@@ -1,0 +1,1 @@
+// SealCheck badge widget
