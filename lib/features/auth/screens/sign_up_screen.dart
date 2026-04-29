@@ -1,11 +1,13 @@
+import 'package:amora/core/widgets/date_picker_field.dart';
+import 'package:amora/core/widgets/social_button.dart';
 import 'package:amora/core/widgets/text_field.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../../core/constants/colors.dart';
-import 'sign_up_screen.dart';
+import 'login_screen.dart';
 
-class LoginScreen extends StatelessWidget {
-  const LoginScreen({super.key});
+class SignUpScreen extends StatelessWidget {
+  const SignUpScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -14,7 +16,6 @@ class LoginScreen extends StatelessWidget {
         child: SingleChildScrollView(
           padding: EdgeInsets.symmetric(horizontal: 24.w),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Text(
                 "Amora",
@@ -22,16 +23,35 @@ class LoginScreen extends StatelessWidget {
                   color: Theme.of(context).colorScheme.primary,
                 ),
               ),
-
               20.verticalSpace,
-              // Welcome Text
+              // Hero Image
+              Container(
+                height: 250.h,
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(20.r),
+                  image: const DecorationImage(
+                    image: AssetImage('assets/images/banner2.jpg'),
+                    fit: BoxFit.cover,
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.1),
+                      blurRadius: 10,
+                      offset: const Offset(0, 5),
+                    ),
+                  ],
+                ),
+              ),
+              20.verticalSpace,
+              // Title
               Text(
-                'Welcome Back',
+                'Create Account',
                 style: Theme.of(context).textTheme.headlineMedium,
               ),
               8.verticalSpace,
               Text(
-                'Sign in to continue your journey of connection.',
+                'Join Amora to start your journey of connection.',
                 style: Theme.of(context).textTheme.labelLarge?.copyWith(
                   color: const Color(0xFF8A7174),
                   fontSize: 14.sp,
@@ -41,39 +61,31 @@ class LoginScreen extends StatelessWidget {
                 ),
                 textAlign: TextAlign.center,
               ),
-              30.verticalSpace,
-              BuildTextField(
+              20.verticalSpace,
+              const BuildTextField(label: 'Full Name', hintText: 'John Doe'),
+              20.verticalSpace,
+              const BuildTextField(
                 label: 'Email Address',
                 hintText: 'hello@amora.com',
               ),
               20.verticalSpace,
-              BuildTextField(
+              BuildDatePickerField(
+                label: 'Date of Birth',
+                hintText: 'DD/MM/YYYY',
+              ),
+              20.verticalSpace,
+              const BuildTextField(
                 label: 'Password',
                 hintText: '••••••••',
                 isPassword: true,
               ),
-              10.verticalSpace,
-              // Forgot Password
-              Align(
-                alignment: Alignment.centerRight,
-                child: TextButton(
-                  onPressed: () {},
-                  child: Text(
-                    'Forgot Password?',
-                    style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                      wordSpacing: 2.5,
-                      fontWeight: FontWeight.w100,
-                    ),
-                  ),
-                ),
-              ),
-              20.verticalSpace,
-              // Login Button
+              30.verticalSpace,
+              // Sign Up Button
               ElevatedButton(
                 onPressed: () {},
                 style: Theme.of(context).elevatedButtonTheme.style,
                 child: Text(
-                  "Login",
+                  "Register",
                   style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                     color: Colors.white,
                     fontWeight: FontWeight.bold,
@@ -88,7 +100,7 @@ class LoginScreen extends StatelessWidget {
                   Padding(
                     padding: EdgeInsets.symmetric(horizontal: 16.w),
                     child: Text(
-                      'or continue with',
+                      'or join with',
                       style: TextStyle(
                         color: AppColors.textSecondary,
                         fontSize: 14.sp,
@@ -99,37 +111,35 @@ class LoginScreen extends StatelessWidget {
                 ],
               ),
               30.verticalSpace,
-
-              buildSocialButton(
+              // Social Sign Up
+              BuildSocialButton(
                 label: 'Google',
-                icon: Icons.g_mobiledata, // Placeholder for Google logo
+                icon: Icons.g_mobiledata,
                 color: Colors.white,
                 textColor: AppColors.textPrimary,
               ),
-
-              30.verticalSpace,
-              // Sign Up Link
+              20.verticalSpace,
+              // Login Link
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
-                    'New to Amora? ',
+                    'Already have an account? ',
                     style: TextStyle(
                       color: AppColors.textPrimary,
                       fontSize: 14.sp,
                     ),
                   ),
-                  2.horizontalSpace,
                   GestureDetector(
                     onTap: () {
                       Navigator.of(context).pushReplacement(
                         MaterialPageRoute(
-                          builder: (context) => const SignUpScreen(),
+                          builder: (context) => const LoginScreen(),
                         ),
                       );
                     },
                     child: Text(
-                      'Sign Up',
+                      'Log In',
                       style: TextStyle(
                         color: AppColors.primary,
                         fontWeight: FontWeight.bold,
@@ -143,39 +153,6 @@ class LoginScreen extends StatelessWidget {
             ],
           ),
         ),
-      ),
-    );
-  }
-
-  Widget buildSocialButton({
-    required String label,
-    required IconData icon,
-    required Color color,
-    required Color textColor,
-  }) {
-    return Container(
-      padding: EdgeInsets.symmetric(vertical: 12.h),
-      decoration: BoxDecoration(
-        color: color,
-        borderRadius: BorderRadius.circular(15.r),
-        border: color == Colors.white
-            ? Border.all(color: Colors.grey[300]!)
-            : null,
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(icon, color: textColor, size: 24.sp),
-          8.horizontalSpace,
-          Text(
-            label,
-            style: TextStyle(
-              color: textColor,
-              fontWeight: FontWeight.bold,
-              fontSize: 16.sp,
-            ),
-          ),
-        ],
       ),
     );
   }
