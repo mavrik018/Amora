@@ -1,4 +1,7 @@
+import 'package:amora/features/profile/screens/user_profile_view.dart';
 import 'package:flutter/material.dart';
+import 'package:amora/features/home/screens/home_screen.dart';
+import 'package:amora/features/discover/screens/discover_screen.dart';
 
 class BottomNavBar extends StatefulWidget {
   const BottomNavBar({super.key});
@@ -11,10 +14,10 @@ class _BottomNavBarState extends State<BottomNavBar> {
   int _currentIndex = 0;
 
   final List<Widget> _screens = const [
-    Center(child: Text('Home Screen')),
-    Center(child: Text('Discover Screen')),
+    HomeScreen(),
+    DiscoverScreen(),
     Center(child: Text('Chat Screen')),
-    Center(child: Text('Profile Screen')),
+    UserProfileView(),
   ];
 
   @override

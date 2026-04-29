@@ -1,1 +1,0 @@
-// Prompt Cards widget
