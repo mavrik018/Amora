@@ -1,5 +1,4 @@
-import 'package:amora/features/auth/screens/sign_up_screen.dart';
-import 'package:amora/shared/widgets/bottom_nav_bar.dart';
+import 'package:amora/features/onboarding/screens/onboarding_screen.dart';
 import 'package:flutter/material.dart';
 
 class CtaButton extends StatelessWidget {
@@ -11,7 +10,7 @@ class CtaButton extends StatelessWidget {
       onPressed: () {
         Navigator.of(
           context,
-        ).push(MaterialPageRoute(builder: (context) => const BottomNavBar()));
+        ).push(MaterialPageRoute(builder: (context) => const OnboardingScreen()));
       },
       style: Theme.of(context).elevatedButtonTheme.style,
       child: Text(

@@ -5,11 +5,15 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 class BuildDatePickerField extends StatefulWidget {
   final String label;
   final String hintText;
+  final DateTime? initialDate;
+  final Function(DateTime)? onDateSelected;
 
   const BuildDatePickerField({
     super.key,
     required this.label,
     required this.hintText,
+    this.initialDate,
+    this.onDateSelected,
   });
 
   @override
@@ -17,7 +21,27 @@ class BuildDatePickerField extends StatefulWidget {
 }
 
 class _BuildDatePickerFieldState extends State<BuildDatePickerField> {
-  final TextEditingController _controller = TextEditingController();
+  late TextEditingController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = TextEditingController();
+    if (widget.initialDate != null) {
+      _controller.text =
+          "${widget.initialDate!.day}/${widget.initialDate!.month}/${widget.initialDate!.year}";
+    }
+  }
+
+  @override
+  void didUpdateWidget(covariant BuildDatePickerField oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.initialDate != oldWidget.initialDate &&
+        widget.initialDate != null) {
+      _controller.text =
+          "${widget.initialDate!.day}/${widget.initialDate!.month}/${widget.initialDate!.year}";
+    }
+  }
 
   @override
   void dispose() {
@@ -28,7 +52,8 @@ class _BuildDatePickerFieldState extends State<BuildDatePickerField> {
   Future<void> _selectDate(BuildContext context) async {
     final DateTime? picked = await showDatePicker(
       context: context,
-      initialDate: DateTime.now().subtract(const Duration(days: 365 * 18)),
+      initialDate: widget.initialDate ??
+          DateTime.now().subtract(const Duration(days: 365 * 18)),
       firstDate: DateTime(1900),
       lastDate: DateTime.now(),
       builder: (context, child) => Theme(
@@ -44,7 +69,12 @@ class _BuildDatePickerFieldState extends State<BuildDatePickerField> {
     );
 
     if (picked != null) {
-      _controller.text = "${picked.day}/${picked.month}/${picked.year}";
+      setState(() {
+        _controller.text = "${picked.day}/${picked.month}/${picked.year}";
+      });
+      if (widget.onDateSelected != null) {
+        widget.onDateSelected!(picked);
+      }
     }
   }
 

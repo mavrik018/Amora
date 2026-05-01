@@ -6,12 +6,16 @@ class BuildTextField extends StatelessWidget {
   final String label;
   final String hintText;
   final bool isPassword;
+  final String? initialValue;
+  final Function(String)? onChanged;
 
   const BuildTextField({
     super.key,
     required this.label,
     required this.hintText,
     this.isPassword = false,
+    this.initialValue,
+    this.onChanged,
   });
 
   @override
@@ -28,8 +32,10 @@ class BuildTextField extends StatelessWidget {
           ),
         ),
         8.verticalSpace,
-        TextField(
+        TextFormField(
+          initialValue: initialValue,
           obscureText: isPassword,
+          onChanged: onChanged,
           decoration: InputDecoration(
             hintText: hintText,
             hintStyle: TextStyle(color: Colors.grey[400]),

@@ -1,11 +1,68 @@
 import 'package:amora/core/widgets/text_field.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../../core/constants/colors.dart';
-import 'sign_up_screen.dart';
+import '../../../core/providers/supabase_provider.dart';
+import '../../../shared/widgets/bottom_nav_bar.dart';
+import '../../onboarding/screens/onboarding_screen.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
-class LoginScreen extends StatelessWidget {
+class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
+
+  @override
+  ConsumerState<LoginScreen> createState() => _LoginScreenState();
+}
+
+class _LoginScreenState extends ConsumerState<LoginScreen> {
+  String _email = '';
+  String _password = '';
+  bool _isLoading = false;
+  String? _errorMessage;
+
+  Future<void> _handleLogin() async {
+    if (_email.trim().isEmpty || _password.trim().isEmpty) {
+      setState(() {
+        _errorMessage = 'Please enter your email and password.';
+      });
+      return;
+    }
+
+    setState(() {
+      _isLoading = true;
+      _errorMessage = null;
+    });
+
+    try {
+      final supabase = ref.read(supabaseProvider);
+      await supabase.auth.signInWithPassword(
+        email: _email.trim(),
+        password: _password.trim(),
+      );
+
+      if (mounted) {
+        Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(builder: (context) => const BottomNavBar()),
+          (route) => false,
+        );
+      }
+    } on AuthException catch (e) {
+      setState(() {
+        _errorMessage = e.message;
+      });
+    } catch (e) {
+      setState(() {
+        _errorMessage = e.toString();
+      });
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -42,15 +99,56 @@ class LoginScreen extends StatelessWidget {
                 textAlign: TextAlign.center,
               ),
               30.verticalSpace,
+
+              if (_errorMessage != null)
+                Padding(
+                  padding: EdgeInsets.only(bottom: 15.h),
+                  child: Container(
+                    padding: EdgeInsets.all(12.r),
+                    decoration: BoxDecoration(
+                      color: Theme.of(
+                        context,
+                      ).colorScheme.error.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(8.r),
+                      border: Border.all(
+                        color: Theme.of(
+                          context,
+                        ).colorScheme.error.withOpacity(0.5),
+                      ),
+                    ),
+                    child: Row(
+                      children: [
+                        Icon(
+                          Icons.error_outline,
+                          color: Theme.of(context).colorScheme.error,
+                          size: 20.r,
+                        ),
+                        10.horizontalSpace,
+                        Expanded(
+                          child: Text(
+                            _errorMessage!,
+                            style: TextStyle(
+                              color: Theme.of(context).colorScheme.error,
+                              fontSize: 13.sp,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+
               BuildTextField(
                 label: 'Email Address',
                 hintText: 'hello@amora.com',
+                onChanged: (val) => _email = val,
               ),
               20.verticalSpace,
               BuildTextField(
                 label: 'Password',
                 hintText: '••••••••',
                 isPassword: true,
+                onChanged: (val) => _password = val,
               ),
               10.verticalSpace,
               // Forgot Password
@@ -70,15 +168,24 @@ class LoginScreen extends StatelessWidget {
               20.verticalSpace,
               // Login Button
               ElevatedButton(
-                onPressed: () {},
+                onPressed: _isLoading ? null : _handleLogin,
                 style: Theme.of(context).elevatedButtonTheme.style,
-                child: Text(
-                  "Login",
-                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
+                child: _isLoading
+                    ? SizedBox(
+                        height: 20.r,
+                        width: 20.r,
+                        child: const CircularProgressIndicator(
+                          color: Colors.white,
+                          strokeWidth: 2.5,
+                        ),
+                      )
+                    : Text(
+                        "Login",
+                        style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
               ),
               30.verticalSpace,
               // Divider
@@ -124,7 +231,7 @@ class LoginScreen extends StatelessWidget {
                     onTap: () {
                       Navigator.of(context).pushReplacement(
                         MaterialPageRoute(
-                          builder: (context) => const SignUpScreen(),
+                          builder: (context) => const OnboardingScreen(),
                         ),
                       );
                     },
