@@ -1,11 +1,13 @@
 import 'package:amora/core/theme/app_theme.dart';
 import 'package:amora/features/onboarding/screens/get_started_screen.dart';
+import 'package:amora/shared/widgets/bottom_nav_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -17,25 +19,31 @@ void main() async {
     anonKey: dotenv.env['SUPABASE_ANON_KEY'] ?? '',
   );
 
+  // Read the login state
+  final prefs = await SharedPreferences.getInstance();
+  final bool isLoggedIn = prefs.getBool('is_logged_in') ?? false;
+
   runApp(
     ProviderScope(
       child: ScreenUtilInit(
         designSize: const Size(411.0, 914.0),
         minTextAdapt: true,
-        builder: (context, child) => MyApp(),
+        builder: (context, child) => MyApp(isLoggedIn: isLoggedIn),
       ),
     ),
   );
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  final bool isLoggedIn;
+  const MyApp({super.key, required this.isLoggedIn});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       theme: AppTheme.lightTheme,
-      home: const GetStartedScreen(),
+      home: isLoggedIn ? const BottomNavBar() : const GetStartedScreen(),
     );
   }
 }

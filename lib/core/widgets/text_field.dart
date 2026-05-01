@@ -7,7 +7,9 @@ class BuildTextField extends StatelessWidget {
   final String hintText;
   final bool isPassword;
   final String? initialValue;
+  final TextEditingController? controller;
   final Function(String)? onChanged;
+  final int maxLines;
 
   const BuildTextField({
     super.key,
@@ -15,7 +17,9 @@ class BuildTextField extends StatelessWidget {
     required this.hintText,
     this.isPassword = false,
     this.initialValue,
+    this.controller,
     this.onChanged,
+    this.maxLines = 1,
   });
 
   @override
@@ -33,9 +37,11 @@ class BuildTextField extends StatelessWidget {
         ),
         8.verticalSpace,
         TextFormField(
-          initialValue: initialValue,
+          initialValue: controller == null ? initialValue : null,
+          controller: controller,
           obscureText: isPassword,
           onChanged: onChanged,
+          maxLines: maxLines,
           decoration: InputDecoration(
             hintText: hintText,
             hintStyle: TextStyle(color: Colors.grey[400]),

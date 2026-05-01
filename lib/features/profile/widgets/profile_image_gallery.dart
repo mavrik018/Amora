@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class ProfileImageGallery extends StatefulWidget {
-  final List<int> images;
+  final List<String> images;
   const ProfileImageGallery({super.key, required this.images});
 
   @override
@@ -21,6 +21,14 @@ class _ProfileImageGalleryState extends State<ProfileImageGallery> {
 
   @override
   Widget build(BuildContext context) {
+    if (widget.images.isEmpty) {
+      return Container(
+        height: 450.h,
+        color: Colors.grey.shade300,
+        child: Icon(Icons.person, size: 120.sp, color: Colors.grey.shade500),
+      );
+    }
+
     return SizedBox(
       height: 450.h,
       child: Stack(
@@ -34,12 +42,21 @@ class _ProfileImageGalleryState extends State<ProfileImageGallery> {
             },
             itemCount: widget.images.length,
             itemBuilder: (context, index) {
-              return Container(
-                color: Colors.grey.shade300,
-                child: Center(
+              return Image.network(
+                widget.images[index],
+                fit: BoxFit.cover,
+                loadingBuilder: (context, child, loadingProgress) {
+                  if (loadingProgress == null) return child;
+                  return Container(
+                    color: Colors.grey.shade300,
+                    child: const Center(child: CircularProgressIndicator()),
+                  );
+                },
+                errorBuilder: (context, error, stackTrace) => Container(
+                  color: Colors.grey.shade300,
                   child: Icon(
-                    Icons.person,
-                    size: 120.sp,
+                    Icons.broken_image,
+                    size: 60.sp,
                     color: Colors.grey.shade500,
                   ),
                 ),

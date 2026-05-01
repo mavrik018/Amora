@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:geolocator/geolocator.dart';
 import '../models/onboarding_state.dart';
 import '../../../core/providers/supabase_provider.dart';
 import '../../profile/providers/profile_provider.dart';
@@ -13,8 +14,54 @@ class OnboardingNotifier extends StateNotifier<OnboardingState> {
   OnboardingNotifier(this._ref) : super(OnboardingState());
 
   Future<void> requestLocationPermission() async {
-    final status = await Permission.location.request();
-    if (status.isDenied) {}
+    bool serviceEnabled;
+    LocationPermission permission;
+
+    // 1. Check if location services are enabled
+    serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      state = state.copyWith(
+        errorMessage:
+            'Location services are disabled. Please enable them in settings.',
+      );
+      return;
+    }
+
+    // 2. Request permission
+    permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        state = state.copyWith(
+          errorMessage:
+              'Location permission is required to find matches in your area.',
+        );
+        return;
+      }
+    }
+
+    if (permission == LocationPermission.deniedForever) {
+      state = state.copyWith(
+        errorMessage:
+            'Location permissions are permanently denied. Please enable them in system settings to proceed.',
+      );
+      return;
+    }
+
+    try {
+      final position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high,
+      );
+      state = state.copyWith(
+        latitude: position.latitude,
+        longitude: position.longitude,
+        errorMessage: null, // Clear errors on success
+      );
+    } catch (e) {
+      state = state.copyWith(
+        errorMessage: 'Could not fetch location. Please try again.',
+      );
+    }
   }
 
   void nextStep() {
@@ -114,6 +161,8 @@ class OnboardingNotifier extends StateNotifier<OnboardingState> {
           interests: state.interests,
           prompts: state.prompts,
           photos: state.photos,
+          latitude: state.latitude,
+          longitude: state.longitude,
         );
 
         await profileRepo.createProfile(profile);

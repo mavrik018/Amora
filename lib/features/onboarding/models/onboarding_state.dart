@@ -12,6 +12,8 @@ class OnboardingState {
   final Map<String, String> prompts;
   final List<String> photos;
   final String? audioBioPath;
+  final double? latitude;
+  final double? longitude;
   final int currentStep;
   final bool isLoading;
   final String? errorMessage;
@@ -28,6 +30,8 @@ class OnboardingState {
     this.prompts = const {},
     this.photos = const [],
     this.audioBioPath,
+    this.latitude,
+    this.longitude,
     this.currentStep = 0,
     this.isLoading = false,
     this.errorMessage,
@@ -45,6 +49,8 @@ class OnboardingState {
     Map<String, String>? prompts,
     List<String>? photos,
     String? audioBioPath,
+    double? latitude,
+    double? longitude,
     int? currentStep,
     bool? isLoading,
     String? errorMessage,
@@ -61,6 +67,8 @@ class OnboardingState {
       prompts: prompts ?? this.prompts,
       photos: photos ?? this.photos,
       audioBioPath: audioBioPath ?? this.audioBioPath,
+      latitude: latitude ?? this.latitude,
+      longitude: longitude ?? this.longitude,
       currentStep: currentStep ?? this.currentStep,
       isLoading: isLoading ?? this.isLoading,
       errorMessage: errorMessage,

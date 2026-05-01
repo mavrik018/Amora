@@ -1,13 +1,41 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import '../models/profile_model.dart';
+import '../../../core/constants/enums.dart';
 
 class ProfileHeaderInfo extends StatelessWidget {
-  const ProfileHeaderInfo({super.key});
+  final ProfileModel profile;
+  const ProfileHeaderInfo({super.key, required this.profile});
+
+  int _calculateAge(DateTime? dob) {
+    if (dob == null) return 0;
+    final now = DateTime.now();
+    int age = now.year - dob.year;
+    if (now.month < dob.month ||
+        (now.month == dob.month && now.day < dob.day)) {
+      age--;
+    }
+    return age;
+  }
+
+  String _getIntentLabel(RelationshipIntent? intent) {
+    switch (intent) {
+      case RelationshipIntent.serious:
+        return 'Seeking Serious';
+      case RelationshipIntent.casual:
+        return 'Casual Fun';
+      case RelationshipIntent.openToBoth:
+        return 'Open To Both';
+      default:
+        return 'Connecting';
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    
+    final age = _calculateAge(profile.dob);
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -24,8 +52,8 @@ class ProfileHeaderInfo extends StatelessWidget {
                     children: [
                       Flexible(
                         child: Text(
-                          'Amora, 26',
-                          style: theme.textTheme.headlineLarge,
+                          profile.fullName,
+                          style: theme.textTheme.headlineSmall,
                           overflow: TextOverflow.ellipsis,
                         ),
                       ),
@@ -33,23 +61,10 @@ class ProfileHeaderInfo extends StatelessWidget {
                       Icon(Icons.verified, color: Colors.blue, size: 22.sp),
                     ],
                   ),
-                  SizedBox(height: 4.h),
-                  Row(
-                    children: [
-                      Icon(Icons.location_on, size: 14.sp, color: Colors.grey.shade700),
-                      SizedBox(width: 4.w),
-                      Text(
-                        '3.2 km away',
-                        style: theme.textTheme.bodyMedium?.copyWith(
-                          color: Colors.grey.shade700,
-                        ),
-                      ),
-                    ],
-                  ),
                 ],
               ),
             ),
-            // Seeking Serious Badge
+            // Intent Badge
             Container(
               padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
               decoration: BoxDecoration(
@@ -57,7 +72,7 @@ class ProfileHeaderInfo extends StatelessWidget {
                 borderRadius: BorderRadius.circular(20.r),
               ),
               child: Text(
-                'Seeking Serious',
+                _getIntentLabel(profile.relationshipIntent),
                 style: theme.textTheme.labelLarge?.copyWith(
                   color: theme.colorScheme.primary,
                   fontSize: 10.sp,
@@ -66,17 +81,6 @@ class ProfileHeaderInfo extends StatelessWidget {
               ),
             ),
           ],
-        ),
-        
-        SizedBox(height: 24.h),
-        
-        // Bio
-        Text(
-          'Artsy soul with a love for deep\nconversations and rainy days at jazz clubs.\nLooking for someone who appreciates\nthe finer things and isn\'t afraid of a little\nadventure. 🌿✨',
-          style: theme.textTheme.bodyLarge?.copyWith(
-            height: 1.6,
-            color: Colors.grey.shade800,
-          ),
         ),
       ],
     );
