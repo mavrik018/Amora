@@ -1,18 +1,18 @@
 import 'package:amora/features/profile/screens/user_profile_view.dart';
+import 'package:amora/shared/widgets/current_tab_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:amora/features/home/screens/home_screen.dart';
 import 'package:amora/features/discover/screens/discover_screen.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class BottomNavBar extends StatefulWidget {
+class BottomNavBar extends ConsumerStatefulWidget {
   const BottomNavBar({super.key});
 
   @override
-  State<BottomNavBar> createState() => _BottomNavBarState();
+  ConsumerState<BottomNavBar> createState() => _BottomNavBarState();
 }
 
-class _BottomNavBarState extends State<BottomNavBar> {
-  int _currentIndex = 0;
-
+class _BottomNavBarState extends ConsumerState<BottomNavBar> {
   final List<Widget> _screens = const [
     HomeScreen(),
     DiscoverScreen(),
@@ -22,15 +22,14 @@ class _BottomNavBarState extends State<BottomNavBar> {
 
   @override
   Widget build(BuildContext context) {
+    final currentIndex = ref.watch(bottomNavIndexProvider);
     return Scaffold(
-      body: IndexedStack(index: _currentIndex, children: _screens),
+      body: IndexedStack(index: currentIndex, children: _screens),
       bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _currentIndex,
+        currentIndex: currentIndex,
         type: BottomNavigationBarType.fixed,
         onTap: (index) {
-          setState(() {
-            _currentIndex = index;
-          });
+          ref.read(bottomNavIndexProvider.notifier).state = index;
         },
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),

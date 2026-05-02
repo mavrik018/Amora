@@ -1,179 +1,187 @@
+import 'package:amora/features/profile/models/profile_model.dart';
+import 'package:amora/shared/widgets/profile_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-class DiscoverSwipeView extends StatelessWidget {
-  const DiscoverSwipeView({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return PageView.builder(
-      itemCount: 8,
-      controller: PageController(viewportFraction: 0.9),
-      itemBuilder: (context, index) {
-        return Padding(
-          padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 8.h),
-          child: _DiscoverSwipeCard(index: index),
-        );
-      },
-    );
-  }
-}
-
-class _DiscoverSwipeCard extends StatelessWidget {
+class DiscoverSwipeCard extends StatelessWidget {
   final int index;
-
-  const _DiscoverSwipeCard({required this.index});
+  final String name;
+  final int age;
+  final String location;
+  final String imageUrl;
+  final dynamic profile;
+  const DiscoverSwipeCard({
+    super.key,
+    required this.index,
+    required this.age,
+    required this.name,
+    required this.location,
+    required this.imageUrl,
+    required this.profile,
+  });
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    // Dummy data based on index to provide variety
-    final names = ['Elena', 'Marc', 'Sophie', 'Aria', 'Julian', 'Chloe'];
-    final ages = ['23', '25', '22', '24', '26', '21'];
-    final locations = [
-      'PARIS',
-      'LONDON',
-      'BERLIN',
-      'MILAN',
-      'BARCELONA',
-      'BRUSSELS',
-    ];
-    final name = names[index % names.length];
-    final age = ages[index % ages.length];
-    final location = locations[index % locations.length];
-
-    return Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(24.r),
-        color: Colors.grey.shade300,
-        boxShadow: const [
-          BoxShadow(
-            color: Colors.black12,
-            blurRadius: 10,
-            offset: Offset(0, 5),
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) =>
+                ProfilePage(profile: ProfileModel.fromJson(profile)),
           ),
-        ],
-      ),
-      child: Stack(
-        children: [
-          // Placeholder image wrapper
-          Positioned.fill(
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(24.r),
-              child: Container(color: Colors.grey.shade400),
+        );
+      },
+      child: Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(24.r),
+          color: Colors.grey.shade300,
+          boxShadow: const [
+            BoxShadow(
+              color: Colors.black12,
+              blurRadius: 10,
+              offset: Offset(0, 5),
             ),
-          ),
-          // Gradient for text readability
-          Positioned.fill(
-            child: Container(
-              decoration: BoxDecoration(
+          ],
+        ),
+        child: Stack(
+          children: [
+            Positioned.fill(
+              child: ClipRRect(
                 borderRadius: BorderRadius.circular(24.r),
-                gradient: LinearGradient(
-                  colors: [Colors.transparent, Colors.black.withOpacity(0.8)],
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
+                child: Image.network(
+                  imageUrl,
+                  fit: BoxFit.cover,
+                  loadingBuilder: (context, child, progress) {
+                    if (progress == null) return child;
+                    return Container(color: Colors.grey.shade300);
+                  },
+                  errorBuilder: (context, error, stackTrace) {
+                    return Container(
+                      color: Colors.grey.shade300,
+                      child: const Icon(Icons.person, size: 40),
+                    );
+                  },
                 ),
               ),
             ),
-          ),
-          // Compatibility
-          Positioned(
-            top: 20.h,
-            left: 20.w,
-            child: Container(
-              padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
-              decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.9),
-                borderRadius: BorderRadius.circular(16.r),
+            // Gradient for text readability
+            Positioned.fill(
+              child: Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(24.r),
+                  gradient: LinearGradient(
+                    colors: [Colors.transparent, Colors.black.withOpacity(0.8)],
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                  ),
+                ),
               ),
-              child: Row(
+            ),
+            // Compatibility
+            Positioned(
+              top: 20.h,
+              left: 20.w,
+              child: Container(
+                padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.9),
+                  borderRadius: BorderRadius.circular(16.r),
+                ),
+                child: Row(
+                  children: [
+                    Icon(Icons.favorite, color: theme.primaryColor, size: 16.w),
+                    SizedBox(width: 4.w),
+                    Text(
+                      '${80 + index * 3}% Match',
+                      style:
+                          theme.textTheme.labelLarge?.copyWith(
+                            color: theme.primaryColor,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 12.sp,
+                          ) ??
+                          TextStyle(
+                            color: theme.primaryColor,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 12.sp,
+                          ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            // Details
+            Positioned(
+              bottom: 24.h,
+              left: 20.w,
+              right: 20.w,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
                 children: [
-                  Icon(Icons.favorite, color: theme.primaryColor, size: 16.w),
-                  SizedBox(width: 4.w),
-                  Text(
-                    '${80 + index * 3}% Match',
-                    style:
-                        theme.textTheme.labelLarge?.copyWith(
-                          color: theme.primaryColor,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 12.sp,
-                        ) ??
-                        TextStyle(
-                          color: theme.primaryColor,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 12.sp,
+                  Row(
+                    children: [
+                      Flexible(
+                        child: Text(
+                          '$name, $age',
+                          style: theme.textTheme.headlineMedium?.copyWith(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                          ),
+                          overflow: TextOverflow.ellipsis,
                         ),
+                      ),
+                      SizedBox(width: 8.w),
+                      Icon(
+                        Icons.verified,
+                        color: theme.colorScheme.secondary,
+                        size: 24.w,
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 8.h),
+                  Row(
+                    children: [
+                      Icon(
+                        Icons.location_on,
+                        color: Colors.white70,
+                        size: 16.w,
+                      ),
+                      SizedBox(width: 4.w),
+                      Text(
+                        location,
+                        style: theme.textTheme.bodyLarge?.copyWith(
+                          color: Colors.white.withOpacity(0.9),
+                        ),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 16.h),
+                  // Action Buttons
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      _buildActionButton(
+                        Icons.close,
+                        Colors.white,
+                        Colors.redAccent,
+                        64.w,
+                      ),
+                      _buildActionButton(
+                        Icons.favorite,
+                        theme.primaryColor,
+                        Colors.white,
+                        80.w,
+                      ),
+                    ],
                   ),
                 ],
               ),
             ),
-          ),
-          // Details
-          Positioned(
-            bottom: 24.h,
-            left: 20.w,
-            right: 20.w,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Row(
-                  children: [
-                    Flexible(
-                      child: Text(
-                        '$name, $age',
-                        style: theme.textTheme.headlineMedium?.copyWith(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                        ),
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                    SizedBox(width: 8.w),
-                    Icon(
-                      Icons.verified,
-                      color: theme.colorScheme.secondary,
-                      size: 24.w,
-                    ),
-                  ],
-                ),
-                SizedBox(height: 8.h),
-                Row(
-                  children: [
-                    Icon(Icons.location_on, color: Colors.white70, size: 16.w),
-                    SizedBox(width: 4.w),
-                    Text(
-                      location,
-                      style: theme.textTheme.bodyLarge?.copyWith(
-                        color: Colors.white.withOpacity(0.9),
-                      ),
-                    ),
-                  ],
-                ),
-                SizedBox(height: 16.h),
-                // Action Buttons
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    _buildActionButton(
-                      Icons.close,
-                      Colors.white,
-                      Colors.redAccent,
-                      64.w,
-                    ),
-                    _buildActionButton(
-                      Icons.favorite,
-                      theme.primaryColor,
-                      Colors.white,
-                      80.w,
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

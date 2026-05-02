@@ -4,9 +4,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path/path.dart' as path;
-import 'package:record/record.dart';
-import 'package:audioplayers/audioplayers.dart';
-import 'package:path_provider/path_provider.dart';
 import '../models/profile_model.dart';
 import '../providers/profile_provider.dart';
 import '../../../core/constants/enums.dart';
@@ -53,8 +50,6 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
     _nameController.dispose();
     super.dispose();
   }
-
-
 
   Future<void> _pickImage(ImageSource source) async {
     final XFile? image = await _picker.pickImage(
@@ -139,10 +134,13 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
       // Identify photos that were removed to delete them from storage
       final originalUrls = widget.profile.photos;
       final remainingUrls = _photos.where((p) => p.startsWith('http')).toList();
-      final urlsToDelete = originalUrls.where((url) => !remainingUrls.contains(url)).toList();
+      final urlsToDelete = originalUrls
+          .where((url) => !remainingUrls.contains(url))
+          .toList();
 
       // Handle Audio Bio cleanup
-      if (widget.profile.audioBioUrl != null && widget.profile.audioBioUrl != finalAudioUrl) {
+      if (widget.profile.audioBioUrl != null &&
+          widget.profile.audioBioUrl != finalAudioUrl) {
         urlsToDelete.add(widget.profile.audioBioUrl!);
       }
 
@@ -151,8 +149,10 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
         try {
           final uri = Uri.parse(url);
           final pathSegments = uri.pathSegments;
-          final storagePath = pathSegments.sublist(pathSegments.indexOf('profiles') + 1).join('/');
-          
+          final storagePath = pathSegments
+              .sublist(pathSegments.indexOf('profiles') + 1)
+              .join('/');
+
           await supabase.storage.from('profiles').remove([storagePath]);
         } catch (e) {
           debugPrint('Error deleting orphaned file: $e');

@@ -26,83 +26,79 @@ class UserProfileView extends ConsumerWidget {
             return const Center(child: Text('Profile not found'));
           }
 
-          return SafeArea(
-            child: Stack(
-              children: [
-                SingleChildScrollView(
-                  padding: EdgeInsets.only(bottom: 120.h, top: 20.h),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      ProfileImageGallery(images: profile.photos),
+          return Stack(
+            children: [
+              SingleChildScrollView(
+                padding: EdgeInsets.only(bottom: 120.h),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    ProfileImageGallery(images: profile.photos),
 
-                      Padding(
-                        padding: EdgeInsets.all(20.w),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            ProfileHeaderInfo(profile: profile),
-                            SizedBox(height: 24.h),
-                            ProfileAudioBio(audioBioUrl: profile.audioBioUrl),
-                            SizedBox(height: 24.h),
-                            ProfilePromptCards(prompts: profile.prompts),
-                            SizedBox(height: 24.h),
-                            ProfileInterestsSection(
-                              interests: profile.interests,
-                            ),
-                            SizedBox(height: 40.h),
-                            // Logout Button
-                            Center(
-                              child: TextButton.icon(
-                                onPressed: () async {
-                                  await AuthService.logout();
-                                  if (context.mounted) {
-                                    Navigator.of(context).pushAndRemoveUntil(
-                                      MaterialPageRoute(
-                                        builder: (context) =>
-                                            const LoginScreen(),
-                                      ),
-                                      (route) => false,
-                                    );
-                                  }
-                                },
-                                icon: Icon(
-                                  Icons.logout_rounded,
+                    Padding(
+                      padding: EdgeInsets.all(20.w),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          ProfileHeaderInfo(profile: profile),
+                          SizedBox(height: 24.h),
+                          ProfileAudioBio(audioBioUrl: profile.audioBioUrl),
+                          SizedBox(height: 24.h),
+                          ProfilePromptCards(prompts: profile.prompts),
+                          SizedBox(height: 24.h),
+                          ProfileInterestsSection(interests: profile.interests),
+                          SizedBox(height: 40.h),
+                          // Logout Button
+                          Center(
+                            child: TextButton.icon(
+                              onPressed: () async {
+                                await AuthService.logout();
+                                if (context.mounted) {
+                                  Navigator.of(context).pushAndRemoveUntil(
+                                    MaterialPageRoute(
+                                      builder: (context) => const LoginScreen(),
+                                    ),
+                                    (route) => false,
+                                  );
+                                }
+                              },
+                              icon: Icon(
+                                Icons.logout_rounded,
+                                color: theme.colorScheme.error,
+                                size: 20.sp,
+                              ),
+                              label: Text(
+                                'Sign Out',
+                                style: theme.textTheme.labelLarge?.copyWith(
                                   color: theme.colorScheme.error,
-                                  size: 20.sp,
+                                  fontSize: 16.sp,
+                                  fontWeight: FontWeight.bold,
                                 ),
-                                label: Text(
-                                  'Sign Out',
-                                  style: theme.textTheme.labelLarge?.copyWith(
-                                    color: theme.colorScheme.error,
-                                    fontSize: 16.sp,
-                                    fontWeight: FontWeight.bold,
-                                  ),
+                              ),
+                              style: TextButton.styleFrom(
+                                padding: EdgeInsets.symmetric(
+                                  horizontal: 24.w,
+                                  vertical: 12.h,
                                 ),
-                                style: TextButton.styleFrom(
-                                  padding: EdgeInsets.symmetric(
-                                    horizontal: 24.w,
-                                    vertical: 12.h,
-                                  ),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(12.r),
-                                    side: BorderSide(
-                                      color: theme.colorScheme.error
-                                          .withOpacity(0.2),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12.r),
+                                  side: BorderSide(
+                                    color: theme.colorScheme.error.withOpacity(
+                                      0.2,
                                     ),
                                   ),
                                 ),
                               ),
                             ),
-                            SizedBox(height: 20.h),
-                          ],
-                        ),
+                          ),
+                          SizedBox(height: 20.h),
+                        ],
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
-              ],
-            ),
+              ),
+            ],
           );
         },
         loading: () => const Center(child: CircularProgressIndicator()),
