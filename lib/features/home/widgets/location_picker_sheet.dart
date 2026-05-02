@@ -10,16 +10,76 @@ class LocationPickerSheet extends ConsumerStatefulWidget {
   const LocationPickerSheet({super.key});
 
   @override
-  ConsumerState<LocationPickerSheet> createState() => _LocationPickerSheetState();
+  ConsumerState<LocationPickerSheet> createState() =>
+      _LocationPickerSheetState();
 }
 
 class _LocationPickerSheetState extends ConsumerState<LocationPickerSheet> {
   final LocationService _locationService = LocationService();
   bool _isLoading = false;
 
+  Future<bool> _ensureCurrentLocationPermission() async {
+    final permission = await _locationService.requestLocationPermission();
+
+    if (permission == LocationPermission.denied) {
+      await _showPermissionDialog(
+        title: 'Location permission required',
+        message:
+            'Location permission is needed to use your current location. Please allow access when prompted.',
+      );
+      return false;
+    }
+
+    if (permission == LocationPermission.deniedForever) {
+      await _showPermissionDialog(
+        title: 'Location permission permanently denied',
+        message:
+            'Location permissions are permanently denied. Please enable them in system settings to continue.',
+        showSettingsAction: true,
+      );
+      return false;
+    }
+
+    return true;
+  }
+
+  Future<void> _showPermissionDialog({
+    required String title,
+    required String message,
+    bool showSettingsAction = false,
+  }) async {
+    if (!mounted) return;
+
+    await showDialog<void>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(title),
+        content: Text(message),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('OK'),
+          ),
+          if (showSettingsAction)
+            TextButton(
+              onPressed: () async {
+                Navigator.of(context).pop();
+                await Geolocator.openAppSettings();
+              },
+              child: const Text('Open Settings'),
+            ),
+        ],
+      ),
+    );
+  }
+
   Future<void> _useCurrentLocation() async {
     setState(() => _isLoading = true);
     try {
+      if (!await _ensureCurrentLocationPermission()) {
+        return;
+      }
+
       Position? position = await _locationService.getCurrentPosition();
       if (position != null) {
         String? address = await _locationService.getAddressFromLatLng(
@@ -43,16 +103,31 @@ class _LocationPickerSheetState extends ConsumerState<LocationPickerSheet> {
 
     final repository = ref.read(profileRepositoryProvider);
 
-    // Add to saved locations if not already there
-    final savedLocations = List<Map<String, dynamic>>.from(profile.savedLocations);
-    final exists = savedLocations.any((loc) => loc['name'] == name);
-    
-    if (!exists) {
-      savedLocations.add({
-        'name': name,
-        'latitude': lat,
-        'longitude': lng,
-      });
+    // First, save the current location if it exists and is different from the new one
+    final savedLocations = List<Map<String, dynamic>>.from(
+      profile.savedLocations,
+    );
+
+    if (profile.locationName != null &&
+        profile.locationName != name &&
+        profile.latitude != null &&
+        profile.longitude != null) {
+      final currentLocExists = savedLocations.any(
+        (loc) => loc['name'] == profile.locationName,
+      );
+      if (!currentLocExists) {
+        savedLocations.add({
+          'name': profile.locationName,
+          'latitude': profile.latitude,
+          'longitude': profile.longitude,
+        });
+      }
+    }
+
+    // Then, add the new location if not already there
+    final newLocExists = savedLocations.any((loc) => loc['name'] == name);
+    if (!newLocExists) {
+      savedLocations.add({'name': name, 'latitude': lat, 'longitude': lng});
     }
 
     final updatedProfile = profile.copyWith(
@@ -87,8 +162,8 @@ class _LocationPickerSheetState extends ConsumerState<LocationPickerSheet> {
               Text(
                 'Relocate',
                 style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
+                  fontWeight: FontWeight.bold,
+                ),
               ),
               IconButton(
                 onPressed: () => Navigator.pop(context),
@@ -107,21 +182,26 @@ class _LocationPickerSheetState extends ConsumerState<LocationPickerSheet> {
                 borderRadius: BorderRadius.circular(16.r),
               ),
             ),
-            icon: _isLoading 
+            icon: _isLoading
                 ? SizedBox(
                     width: 20.w,
                     height: 20.w,
-                    child: const CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+                    child: const CircularProgressIndicator(
+                      color: Colors.white,
+                      strokeWidth: 2,
+                    ),
                   )
                 : const Icon(Icons.my_location),
-            label: Text(_isLoading ? 'Getting location...' : 'Use Current Location'),
+            label: Text(
+              _isLoading ? 'Getting location...' : 'Use Current Location',
+            ),
           ),
           SizedBox(height: 32.h),
           Text(
             'Previous Locations',
-            style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.bold,
-                ),
+            style: Theme.of(
+              context,
+            ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
           ),
           SizedBox(height: 16.h),
           profileAsync.when(
@@ -132,9 +212,9 @@ class _LocationPickerSheetState extends ConsumerState<LocationPickerSheet> {
                     padding: EdgeInsets.all(16.h),
                     child: Text(
                       'No previous locations saved',
-                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                            color: Colors.grey,
-                          ),
+                      style: Theme.of(
+                        context,
+                      ).textTheme.bodyMedium?.copyWith(color: Colors.grey),
                     ),
                   ),
                 );
@@ -164,12 +244,16 @@ class _LocationPickerSheetState extends ConsumerState<LocationPickerSheet> {
                     title: Text(
                       loc['name'] ?? 'Unknown',
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                            fontWeight: isCurrent ? FontWeight.bold : null,
-                            color: isCurrent ? AppColors.primary : null,
-                          ),
+                        fontWeight: isCurrent ? FontWeight.bold : null,
+                        color: isCurrent ? AppColors.primary : null,
+                      ),
                     ),
-                    trailing: isCurrent 
-                        ? Icon(Icons.check_circle, color: AppColors.primary, size: 20.w)
+                    trailing: isCurrent
+                        ? Icon(
+                            Icons.check_circle,
+                            color: AppColors.primary,
+                            size: 20.w,
+                          )
                         : null,
                     onTap: () => _updateLocation(
                       loc['name'],

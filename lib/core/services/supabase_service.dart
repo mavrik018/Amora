@@ -1,3 +1,4 @@
+import 'package:amora/features/profile/models/profile_model.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class SupabaseService {
@@ -12,18 +13,42 @@ class SupabaseService {
   User? get user => auth.currentUser;
   Session? get session => auth.currentSession;
 
-  Future<List<Map<String, dynamic>>> getProfiles() async {
+  Future<List<ProfileModel>> getProfiles() async {
     final userID = user?.id;
-    print('Current userID: $userID');
-    if (userID == null) {
-      print('User not logged in, returning empty list');
-      return [];
-    }
-    print('Fetching profiles excluding userID: $userID');
+    if (userID == null) return [];
+
     final response = await client.from('profiles').select().neq('id', userID);
-    print('Raw response from Supabase: $response');
-    final profiles = List<Map<String, dynamic>>.from(response);
-    print('Parsed profiles: $profiles');
-    return profiles;
+    return List<ProfileModel>.from(
+      (response as List).map((x) => ProfileModel.fromJson(x)),
+    );
+  }
+
+  Future<List<ProfileModel>> getRecommendedProfiles({
+    required String? gender,
+    required int minAge,
+    required int maxAge,
+    required double lat,
+    required double lng,
+    required double radiusKm,
+  }) async {
+    final userID = user?.id;
+    if (userID == null) return [];
+
+    final response = await client.rpc(
+      'get_recommended_profiles',
+      params: {
+        'p_user_id': userID,
+        'p_gender': gender,
+        'p_min_age': minAge,
+        'p_max_age': maxAge,
+        'p_lat': lat,
+        'p_lng': lng,
+        'p_radius_km': radiusKm,
+      },
+    );
+
+    return List<ProfileModel>.from(
+      (response as List).map((x) => ProfileModel.fromJson(x)),
+    );
   }
 }

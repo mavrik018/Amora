@@ -9,7 +9,7 @@ class DiscoverGridCard extends StatelessWidget {
   final int age;
   final String location;
   final String imageUrl;
-  final dynamic profile;
+  final ProfileModel profile;
   const DiscoverGridCard({
     super.key,
     required this.index,
@@ -25,11 +25,10 @@ class DiscoverGridCard extends StatelessWidget {
     final theme = Theme.of(context);
     return GestureDetector(
       onTap: () {
-        final profileData = ProfileModel.fromJson(profile);
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => ProfilePage(profile: profileData),
+            builder: (context) => ProfilePage(profile: profile),
           ),
         );
       },

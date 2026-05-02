@@ -1,4 +1,5 @@
 import 'package:amora/features/discover/providers/profiles.dart';
+import 'package:amora/features/profile/models/profile_model.dart';
 import 'package:amora/features/discover/widgets/active_filters_list.dart';
 import 'package:amora/features/discover/widgets/discover_grid_card.dart';
 import 'package:amora/features/discover/widgets/discover_swipe_view.dart';
@@ -17,20 +18,6 @@ class DiscoverScreen extends ConsumerStatefulWidget {
 
 class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
   bool isGridMode = true;
-
-  int calculateAge(String dobString) {
-    final dob = DateTime.parse(dobString);
-    final today = DateTime.now();
-
-    int age = today.year - dob.year;
-
-    if (today.month < dob.month ||
-        (today.month == dob.month && today.day < dob.day)) {
-      age--;
-    }
-
-    return age;
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -83,17 +70,14 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
                         itemCount: profiles.length,
                         itemBuilder: (context, index) {
                           final profile = profiles[index];
-                          final name = profile['full_name'];
-                          final location = profile['location_name'];
-                          final dob = profile['dob'];
-                          final age = calculateAge(dob);
-                          final imageUrl = profile['photos'][0];
                           return DiscoverGridCard(
                             index: index,
-                            age: age,
-                            location: location,
-                            name: name,
-                            imageUrl: imageUrl,
+                            age: profile.age ?? 0,
+                            location: profile.locationName ?? 'Unknown',
+                            name: profile.fullName,
+                            imageUrl: profile.photos.isNotEmpty
+                                ? profile.photos[0]
+                                : '',
                             profile: profile,
                           );
                         },
@@ -103,11 +87,6 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
                         controller: PageController(viewportFraction: 0.9),
                         itemBuilder: (context, index) {
                           final profile = profiles[index];
-                          final name = profile['full_name'];
-                          final location = profile['location_name'];
-                          final dob = profile['dob'];
-                          final age = calculateAge(dob);
-                          final imageUrl = profile['photos'][0];
                           return Padding(
                             padding: EdgeInsets.symmetric(
                               horizontal: 8.w,
@@ -115,10 +94,12 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
                             ),
                             child: DiscoverSwipeCard(
                               index: index,
-                              name: name,
-                              age: age,
-                              location: location,
-                              imageUrl: imageUrl,
+                              name: profile.fullName,
+                              age: profile.age ?? 0,
+                              location: profile.locationName ?? 'Unknown',
+                              imageUrl: profile.photos.isNotEmpty
+                                  ? profile.photos[0]
+                                  : '',
                               profile: profile,
                             ),
                           );

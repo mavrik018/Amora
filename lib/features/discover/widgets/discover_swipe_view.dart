@@ -9,7 +9,7 @@ class DiscoverSwipeCard extends StatelessWidget {
   final int age;
   final String location;
   final String imageUrl;
-  final dynamic profile;
+  final ProfileModel profile;
   const DiscoverSwipeCard({
     super.key,
     required this.index,
@@ -29,8 +29,7 @@ class DiscoverSwipeCard extends StatelessWidget {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) =>
-                ProfilePage(profile: ProfileModel.fromJson(profile)),
+            builder: (context) => ProfilePage(profile: profile),
           ),
         );
       },

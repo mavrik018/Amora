@@ -1,22 +1,22 @@
 import 'package:amora/core/constants/colors.dart';
+import 'package:amora/features/discover/providers/filters_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-class FiltersBottomSheet extends StatefulWidget {
+class FiltersBottomSheet extends ConsumerStatefulWidget {
   const FiltersBottomSheet({super.key});
 
   @override
-  State<FiltersBottomSheet> createState() => _FiltersBottomSheetState();
+  ConsumerState<FiltersBottomSheet> createState() => _FiltersBottomSheetState();
 }
 
-class _FiltersBottomSheetState extends State<FiltersBottomSheet> {
-  RangeValues _ageRange = const RangeValues(18, 24);
-  double _distance = 50;
-  String _selectedGender = 'Women';
-  bool _verifiedOnly = true;
-
+class _FiltersBottomSheetState extends ConsumerState<FiltersBottomSheet> {
   @override
   Widget build(BuildContext context) {
+    final filters = ref.watch(discoveryFiltersProvider);
+    final filterNotifier = ref.read(discoveryFiltersProvider.notifier);
+
     return Container(
       width: double.infinity,
       decoration: BoxDecoration(
@@ -53,12 +53,7 @@ class _FiltersBottomSheetState extends State<FiltersBottomSheet> {
                   ),
                   TextButton(
                     onPressed: () {
-                      setState(() {
-                        _ageRange = const RangeValues(18, 24);
-                        _distance = 50;
-                        _selectedGender = 'Women';
-                        _verifiedOnly = true;
-                      });
+                      filterNotifier.reset();
                     },
                     style: TextButton.styleFrom(
                       foregroundColor: AppColors.primary,
@@ -101,7 +96,7 @@ class _FiltersBottomSheetState extends State<FiltersBottomSheet> {
                       borderRadius: BorderRadius.circular(16.r),
                     ),
                     child: Text(
-                      '${_ageRange.start.round()} - ${_ageRange.end.round()}',
+                      '${filters.minAge.round()} - ${filters.maxAge.round()}',
                       style: TextStyle(
                         fontSize: 14.sp,
                         fontWeight: FontWeight.bold,
@@ -126,13 +121,11 @@ class _FiltersBottomSheetState extends State<FiltersBottomSheet> {
                   thumbColor: Colors.white,
                 ),
                 child: RangeSlider(
-                  values: _ageRange,
+                  values: RangeValues(filters.minAge, filters.maxAge),
                   min: 18,
                   max: 65,
                   onChanged: (values) {
-                    setState(() {
-                      _ageRange = values;
-                    });
+                    filterNotifier.setAgeRange(values);
                   },
                 ),
               ),
@@ -151,7 +144,7 @@ class _FiltersBottomSheetState extends State<FiltersBottomSheet> {
                     ),
                   ),
                   Text(
-                    'Up to ${_distance.round()} km',
+                    'Up to ${filters.distance.round()} km',
                     style: TextStyle(
                       fontSize: 14.sp,
                       fontWeight: FontWeight.w600,
@@ -175,13 +168,11 @@ class _FiltersBottomSheetState extends State<FiltersBottomSheet> {
                   thumbColor: Colors.white,
                 ),
                 child: Slider(
-                  value: _distance,
+                  value: filters.distance,
                   min: 1,
-                  max: 1000,
+                  max: 10000,
                   onChanged: (value) {
-                    setState(() {
-                      _distance = value;
-                    });
+                    filterNotifier.setDistance(value);
                   },
                 ),
               ),
@@ -197,14 +188,21 @@ class _FiltersBottomSheetState extends State<FiltersBottomSheet> {
                 ),
               ),
               SizedBox(height: 16.h),
-              Row(
-                children: [
-                  _buildGenderButton('Women'),
-                  SizedBox(width: 8.w),
-                  _buildGenderButton('Men'),
-                  SizedBox(width: 8.w),
-                  _buildGenderButton('Non-binary'),
-                ],
+              SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  children: [
+                    _buildGenderButton('Woman', filters.gender, filterNotifier),
+                    SizedBox(width: 8.w),
+                    _buildGenderButton('Man', filters.gender, filterNotifier),
+                    SizedBox(width: 8.w),
+                    _buildGenderButton(
+                      'Non-binary',
+                      filters.gender,
+                      filterNotifier,
+                    ),
+                  ],
+                ),
               ),
               SizedBox(height: 32.h),
 
@@ -247,15 +245,13 @@ class _FiltersBottomSheetState extends State<FiltersBottomSheet> {
                       ),
                     ),
                     Switch(
-                      value: _verifiedOnly,
+                      value: filters.verifiedOnly,
                       activeColor: Colors.white,
                       activeTrackColor: AppColors.primary,
                       inactiveThumbColor: Colors.white,
                       inactiveTrackColor: Colors.grey.shade300,
                       onChanged: (value) {
-                        setState(() {
-                          _verifiedOnly = value;
-                        });
+                        filterNotifier.setVerifiedOnly(value);
                       },
                     ),
                   ],
@@ -269,13 +265,15 @@ class _FiltersBottomSheetState extends State<FiltersBottomSheet> {
     );
   }
 
-  Widget _buildGenderButton(String gender) {
-    final isSelected = _selectedGender == gender;
+  Widget _buildGenderButton(
+    String gender,
+    String selectedGender,
+    DiscoveryFiltersNotifier notifier,
+  ) {
+    final isSelected = selectedGender == gender;
     return GestureDetector(
       onTap: () {
-        setState(() {
-          _selectedGender = gender;
-        });
+        notifier.setGender(gender);
       },
       child: Container(
         padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),

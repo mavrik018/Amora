@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/legacy.dart';
 
 class DiscoveryFilters {
   final double minAge;
@@ -10,9 +10,9 @@ class DiscoveryFilters {
 
   const DiscoveryFilters({
     this.minAge = 18,
-    this.maxAge = 24,
-    this.distance = 50,
-    this.gender = 'Women',
+    this.maxAge = 65,
+    this.distance = 10000,
+    this.gender = 'Non-binary',
     this.verifiedOnly = true,
   });
 
@@ -59,5 +59,5 @@ class DiscoveryFiltersNotifier extends StateNotifier<DiscoveryFilters> {
 
 final discoveryFiltersProvider =
     StateNotifierProvider<DiscoveryFiltersNotifier, DiscoveryFilters>((ref) {
-  return DiscoveryFiltersNotifier();
-});
+      return DiscoveryFiltersNotifier();
+    });
