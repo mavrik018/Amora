@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import '../../../core/services/auth_service.dart';
 import '../../auth/screens/login_screen.dart';
 import '../providers/profile_provider.dart';
 import 'edit_profile_screen.dart';
@@ -53,10 +54,7 @@ class UserProfileView extends ConsumerWidget {
                           Center(
                             child: TextButton.icon(
                               onPressed: () async {
-                                final prefs =
-                                    await SharedPreferences.getInstance();
-                                await prefs.setBool('is_logged_in', false);
-                                await Supabase.instance.client.auth.signOut();
+                                await AuthService.logout();
                                 if (context.mounted) {
                                   Navigator.of(context).pushAndRemoveUntil(
                                     MaterialPageRoute(

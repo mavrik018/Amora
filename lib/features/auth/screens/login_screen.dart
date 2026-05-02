@@ -8,6 +8,7 @@ import '../../../shared/widgets/bottom_nav_bar.dart';
 import '../../onboarding/screens/onboarding_screen.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../../../core/services/auth_service.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
@@ -43,9 +44,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       );
 
       if (mounted) {
-        // Save login state
-        final prefs = await SharedPreferences.getInstance();
-        await prefs.setBool('is_logged_in', true);
+        // Save login state safely
+        final user = supabase.auth.currentUser;
+        if (user != null) {
+          await AuthService.persistLogin(user.id);
+        }
 
         Navigator.of(context).pushAndRemoveUntil(
           MaterialPageRoute(builder: (context) => const BottomNavBar()),

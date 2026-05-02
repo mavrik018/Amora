@@ -4,10 +4,9 @@ import 'package:amora/shared/widgets/bottom_nav_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:amora/core/services/auth_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -19,9 +18,8 @@ void main() async {
     anonKey: dotenv.env['SUPABASE_ANON_KEY'] ?? '',
   );
 
-  // Read the login state
-  final prefs = await SharedPreferences.getInstance();
-  final bool isLoggedIn = prefs.getBool('is_logged_in') ?? false;
+  // Read the login state safely
+  final bool isLoggedIn = await AuthService.isLoggedIn();
 
   runApp(
     ProviderScope(
