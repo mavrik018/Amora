@@ -12,6 +12,7 @@ import '../providers/profile_provider.dart';
 import '../../../core/constants/enums.dart';
 import '../../../core/widgets/text_field.dart';
 import '../../../core/providers/supabase_provider.dart';
+import '../../../shared/widgets/audio_bio_editor.dart';
 
 class EditProfileScreen extends ConsumerStatefulWidget {
   final ProfileModel profile;
@@ -26,16 +27,14 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
   late RelationshipIntent _intent;
   late List<String> _photos;
   late Map<String, String> _prompts;
+  late String _gender;
+  late String _interestedIn;
   String? _audioBioUrl;
   bool _isLoading = false;
   final ImagePicker _picker = ImagePicker();
 
   // Audio recording state
-  final AudioRecorder _audioRecorder = AudioRecorder();
-  final AudioPlayer _audioPlayer = AudioPlayer();
-  bool _isRecording = false;
   String? _localAudioPath;
-  bool _isPlaying = false;
 
   @override
   void initState() {
@@ -45,74 +44,17 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
     _photos = List<String>.from(widget.profile.photos);
     _prompts = Map<String, String>.from(widget.profile.prompts);
     _audioBioUrl = widget.profile.audioBioUrl;
-
-    _audioPlayer.onPlayerStateChanged.listen((state) {
-      if (mounted) {
-        setState(() {
-          _isPlaying = state == PlayerState.playing;
-        });
-      }
-    });
+    _gender = widget.profile.gender;
+    _interestedIn = widget.profile.interestedIn;
   }
 
   @override
   void dispose() {
     _nameController.dispose();
-    _audioRecorder.dispose();
-    _audioPlayer.dispose();
     super.dispose();
   }
 
-  Future<void> _startRecording() async {
-    try {
-      if (await _audioRecorder.hasPermission()) {
-        final directory = await getApplicationDocumentsDirectory();
-        final filePath = path.join(
-          directory.path,
-          'audio_bio_${DateTime.now().millisecondsSinceEpoch}.m4a',
-        );
 
-        const config = RecordConfig();
-        await _audioRecorder.start(config, path: filePath);
-
-        setState(() {
-          _isRecording = true;
-          _localAudioPath = filePath;
-        });
-      }
-    } catch (e) {
-      debugPrint('Error starting recording: $e');
-    }
-  }
-
-  Future<void> _stopRecording() async {
-    try {
-      final path = await _audioRecorder.stop();
-      setState(() {
-        _isRecording = false;
-        _localAudioPath = path;
-        _audioBioUrl = null; // Clear existing URL if we have a new recording
-      });
-    } catch (e) {
-      debugPrint('Error stopping recording: $e');
-    }
-  }
-
-  Future<void> _playRecording() async {
-    try {
-      if (_isPlaying) {
-        await _audioPlayer.pause();
-      } else {
-        if (_localAudioPath != null) {
-          await _audioPlayer.play(DeviceFileSource(_localAudioPath!));
-        } else if (_audioBioUrl != null) {
-          await _audioPlayer.play(UrlSource(_audioBioUrl!));
-        }
-      }
-    } catch (e) {
-      debugPrint('Error playing audio: $e');
-    }
-  }
 
   Future<void> _pickImage(ImageSource source) async {
     final XFile? image = await _picker.pickImage(
@@ -194,12 +136,35 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
             .getPublicUrl(fileName);
       }
 
+      // Identify photos that were removed to delete them from storage
+      final originalUrls = widget.profile.photos;
+      final remainingUrls = _photos.where((p) => p.startsWith('http')).toList();
+      final urlsToDelete = originalUrls.where((url) => !remainingUrls.contains(url)).toList();
+
+      // Handle Audio Bio cleanup
+      if (widget.profile.audioBioUrl != null && widget.profile.audioBioUrl != finalAudioUrl) {
+        urlsToDelete.add(widget.profile.audioBioUrl!);
+      }
+
+      // Delete removed files from Supabase Storage
+      for (String url in urlsToDelete) {
+        try {
+          final uri = Uri.parse(url);
+          final pathSegments = uri.pathSegments;
+          final storagePath = pathSegments.sublist(pathSegments.indexOf('profiles') + 1).join('/');
+          
+          await supabase.storage.from('profiles').remove([storagePath]);
+        } catch (e) {
+          debugPrint('Error deleting orphaned file: $e');
+        }
+      }
+
       final updatedProfile = ProfileModel(
         id: widget.profile.id,
         fullName: _nameController.text.trim(),
         dob: widget.profile.dob,
-        gender: widget.profile.gender,
-        interestedIn: widget.profile.interestedIn,
+        gender: _gender,
+        interestedIn: _interestedIn,
         relationshipIntent: _intent,
         interests: widget.profile.interests,
         prompts: _prompts,
@@ -363,88 +328,17 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
               ),
             ),
             SizedBox(height: 16.h),
-            Container(
-              padding: EdgeInsets.all(16.r),
-              decoration: BoxDecoration(
-                color: theme.colorScheme.primary.withOpacity(0.05),
-                borderRadius: BorderRadius.circular(16.r),
-                border: Border.all(
-                  color: theme.colorScheme.primary.withOpacity(0.1),
-                ),
-              ),
-              child: Row(
-                children: [
-                  GestureDetector(
-                    onTap: _isRecording ? _stopRecording : _startRecording,
-                    child: Container(
-                      padding: EdgeInsets.all(12.r),
-                      decoration: BoxDecoration(
-                        color: _isRecording
-                            ? Colors.red
-                            : theme.colorScheme.primary,
-                        shape: BoxShape.circle,
-                      ),
-                      child: Icon(
-                        _isRecording ? Icons.stop : Icons.mic,
-                        color: Colors.white,
-                        size: 24.sp,
-                      ),
-                    ),
-                  ),
-                  SizedBox(width: 16.w),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          _isRecording
-                              ? 'Recording...'
-                              : (_localAudioPath != null ||
-                                    _audioBioUrl != null)
-                              ? 'Audio bio ready'
-                              : 'Record an audio bio',
-                          style: theme.textTheme.bodyMedium?.copyWith(
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        if (!_isRecording &&
-                            (_localAudioPath != null || _audioBioUrl != null))
-                          Text(
-                            'Tap play to listen',
-                            style: theme.textTheme.bodySmall?.copyWith(
-                              color: Colors.grey.shade600,
-                            ),
-                          ),
-                      ],
-                    ),
-                  ),
-                  if (!_isRecording &&
-                      (_localAudioPath != null || _audioBioUrl != null))
-                    Row(
-                      children: [
-                        IconButton(
-                          onPressed: _playRecording,
-                          icon: Icon(
-                            _isPlaying ? Icons.pause : Icons.play_arrow,
-                            color: theme.colorScheme.primary,
-                          ),
-                        ),
-                        IconButton(
-                          onPressed: () {
-                            setState(() {
-                              _localAudioPath = null;
-                              _audioBioUrl = null;
-                            });
-                          },
-                          icon: const Icon(
-                            Icons.delete_outline,
-                            color: Colors.red,
-                          ),
-                        ),
-                      ],
-                    ),
-                ],
-              ),
+            AudioBioEditor(
+              initialAudioUrl: _audioBioUrl,
+              initialLocalPath: _localAudioPath,
+              onAudioChanged: (path) {
+                setState(() {
+                  _localAudioPath = path;
+                  if (path != null) {
+                    _audioBioUrl = null;
+                  }
+                });
+              },
             ),
             SizedBox(height: 32.h),
 
@@ -452,6 +346,56 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
               label: 'Full Name',
               hintText: 'Your Name',
               controller: _nameController,
+            ),
+            SizedBox(height: 32.h),
+
+            Text(
+              'My Gender',
+              style: theme.textTheme.labelLarge?.copyWith(
+                fontWeight: FontWeight.bold,
+                color: Colors.grey.shade700,
+              ),
+            ),
+            SizedBox(height: 12.h),
+            Wrap(
+              spacing: 12.w,
+              runSpacing: 12.h,
+              children: ['Man', 'Woman', 'Other'].map((gender) {
+                final isSelected = _gender == gender;
+                return ChoiceChip(
+                  label: Text(gender),
+                  selected: isSelected,
+                  selectedColor: theme.colorScheme.primary.withOpacity(0.2),
+                  onSelected: (selected) {
+                    if (selected) setState(() => _gender = gender);
+                  },
+                );
+              }).toList(),
+            ),
+            SizedBox(height: 32.h),
+
+            Text(
+              'Interested In',
+              style: theme.textTheme.labelLarge?.copyWith(
+                fontWeight: FontWeight.bold,
+                color: Colors.grey.shade700,
+              ),
+            ),
+            SizedBox(height: 12.h),
+            Wrap(
+              spacing: 12.w,
+              runSpacing: 12.h,
+              children: ['Men', 'Women', 'Everyone'].map((option) {
+                final isSelected = _interestedIn == option;
+                return ChoiceChip(
+                  label: Text(option),
+                  selected: isSelected,
+                  selectedColor: theme.colorScheme.primary.withOpacity(0.2),
+                  onSelected: (selected) {
+                    if (selected) setState(() => _interestedIn = option);
+                  },
+                );
+              }).toList(),
             ),
             SizedBox(height: 32.h),
 

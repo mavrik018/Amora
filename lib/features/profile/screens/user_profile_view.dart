@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../../core/services/auth_service.dart';
 import '../../auth/screens/login_screen.dart';
 import '../providers/profile_provider.dart';
@@ -28,79 +26,83 @@ class UserProfileView extends ConsumerWidget {
             return const Center(child: Text('Profile not found'));
           }
 
-          return Stack(
-            children: [
-              SingleChildScrollView(
-                padding: EdgeInsets.only(bottom: 120.h),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    ProfileImageGallery(images: profile.photos),
+          return SafeArea(
+            child: Stack(
+              children: [
+                SingleChildScrollView(
+                  padding: EdgeInsets.only(bottom: 120.h, top: 20.h),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      ProfileImageGallery(images: profile.photos),
 
-                    Padding(
-                      padding: EdgeInsets.all(20.w),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          ProfileHeaderInfo(profile: profile),
-                          SizedBox(height: 24.h),
-                          ProfileAudioBio(audioBioUrl: profile.audioBioUrl),
-                          SizedBox(height: 24.h),
-                          ProfilePromptCards(prompts: profile.prompts),
-                          SizedBox(height: 24.h),
-                          ProfileInterestsSection(interests: profile.interests),
-                          SizedBox(height: 40.h),
-                          // Logout Button
-                          Center(
-                            child: TextButton.icon(
-                              onPressed: () async {
-                                await AuthService.logout();
-                                if (context.mounted) {
-                                  Navigator.of(context).pushAndRemoveUntil(
-                                    MaterialPageRoute(
-                                      builder: (context) => const LoginScreen(),
-                                    ),
-                                    (route) => false,
-                                  );
-                                }
-                              },
-                              icon: Icon(
-                                Icons.logout_rounded,
-                                color: theme.colorScheme.error,
-                                size: 20.sp,
-                              ),
-                              label: Text(
-                                'Sign Out',
-                                style: theme.textTheme.labelLarge?.copyWith(
+                      Padding(
+                        padding: EdgeInsets.all(20.w),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            ProfileHeaderInfo(profile: profile),
+                            SizedBox(height: 24.h),
+                            ProfileAudioBio(audioBioUrl: profile.audioBioUrl),
+                            SizedBox(height: 24.h),
+                            ProfilePromptCards(prompts: profile.prompts),
+                            SizedBox(height: 24.h),
+                            ProfileInterestsSection(
+                              interests: profile.interests,
+                            ),
+                            SizedBox(height: 40.h),
+                            // Logout Button
+                            Center(
+                              child: TextButton.icon(
+                                onPressed: () async {
+                                  await AuthService.logout();
+                                  if (context.mounted) {
+                                    Navigator.of(context).pushAndRemoveUntil(
+                                      MaterialPageRoute(
+                                        builder: (context) =>
+                                            const LoginScreen(),
+                                      ),
+                                      (route) => false,
+                                    );
+                                  }
+                                },
+                                icon: Icon(
+                                  Icons.logout_rounded,
                                   color: theme.colorScheme.error,
-                                  fontSize: 16.sp,
-                                  fontWeight: FontWeight.bold,
+                                  size: 20.sp,
                                 ),
-                              ),
-                              style: TextButton.styleFrom(
-                                padding: EdgeInsets.symmetric(
-                                  horizontal: 24.w,
-                                  vertical: 12.h,
+                                label: Text(
+                                  'Sign Out',
+                                  style: theme.textTheme.labelLarge?.copyWith(
+                                    color: theme.colorScheme.error,
+                                    fontSize: 16.sp,
+                                    fontWeight: FontWeight.bold,
+                                  ),
                                 ),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(12.r),
-                                  side: BorderSide(
-                                    color: theme.colorScheme.error.withOpacity(
-                                      0.2,
+                                style: TextButton.styleFrom(
+                                  padding: EdgeInsets.symmetric(
+                                    horizontal: 24.w,
+                                    vertical: 12.h,
+                                  ),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12.r),
+                                    side: BorderSide(
+                                      color: theme.colorScheme.error
+                                          .withOpacity(0.2),
                                     ),
                                   ),
                                 ),
                               ),
                             ),
-                          ),
-                          SizedBox(height: 20.h),
-                        ],
+                            SizedBox(height: 20.h),
+                          ],
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           );
         },
         loading: () => const Center(child: CircularProgressIndicator()),

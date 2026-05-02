@@ -1,3 +1,5 @@
+import 'dart:io';
+import 'package:image_picker/image_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -5,10 +7,8 @@ import '../providers/onboarding_provider.dart';
 import '../../../core/widgets/text_field.dart';
 import '../../../core/widgets/date_picker_field.dart';
 import '../../../core/constants/enums.dart';
+import '../../../shared/widgets/audio_bio_editor.dart';
 
-// ─────────────────────────────────────────────
-// Shared step header widget
-// ─────────────────────────────────────────────
 class _StepHeader extends StatelessWidget {
   final String title;
   final String subtitle;
@@ -44,9 +44,6 @@ class _StepHeader extends StatelessWidget {
   }
 }
 
-// ─────────────────────────────────────────────
-// Shared section label
-// ─────────────────────────────────────────────
 class _SectionLabel extends StatelessWidget {
   final String text;
   final String? badge;
@@ -83,9 +80,6 @@ class _SectionLabel extends StatelessWidget {
   }
 }
 
-// ─────────────────────────────────────────────
-// Step 1: Credentials
-// ─────────────────────────────────────────────
 class CredentialsStep extends ConsumerWidget {
   const CredentialsStep({super.key});
 
@@ -126,9 +120,6 @@ class CredentialsStep extends ConsumerWidget {
   }
 }
 
-// ─────────────────────────────────────────────
-// Step 2: Basic Info
-// ─────────────────────────────────────────────
 class BasicInfoStep extends ConsumerWidget {
   const BasicInfoStep({super.key});
 
@@ -159,6 +150,22 @@ class BasicInfoStep extends ConsumerWidget {
           onDateSelected: notifier.updateDob,
         ),
         16.verticalSpace,
+        _SectionLabel(text: 'My Gender'),
+        12.verticalSpace,
+        _OptionSelector(
+          selected: state.gender,
+          onSelected: notifier.updateGender,
+          options: const ['Man', 'Woman', 'Other'],
+        ),
+        16.verticalSpace,
+        _SectionLabel(text: 'Interested In'),
+        12.verticalSpace,
+        _OptionSelector(
+          selected: state.interestedIn,
+          onSelected: notifier.updateInterestedIn,
+          options: const ['Men', 'Women', 'Everyone'],
+        ),
+        16.verticalSpace,
         _SectionLabel(text: 'Relationship Intent'),
         12.verticalSpace,
         _IntentSelector(
@@ -166,6 +173,58 @@ class BasicInfoStep extends ConsumerWidget {
           onSelected: notifier.updateRelationshipIntent,
         ),
       ],
+    );
+  }
+}
+
+class _OptionSelector extends StatelessWidget {
+  final String selected;
+  final ValueChanged<String> onSelected;
+  final List<String> options;
+
+  const _OptionSelector({
+    required this.selected,
+    required this.onSelected,
+    required this.options,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Row(
+      children: options.map((option) {
+        final isSelected = selected == option;
+        return Expanded(
+          child: GestureDetector(
+            onTap: () => onSelected(option),
+            child: Container(
+              margin: EdgeInsets.only(
+                right: option != options.last ? 8.w : 0,
+              ),
+              padding: EdgeInsets.symmetric(vertical: 14.h),
+              decoration: BoxDecoration(
+                color: isSelected
+                    ? theme.colorScheme.primary
+                    : theme.colorScheme.surface,
+                borderRadius: BorderRadius.circular(14.r),
+                border: Border.all(
+                  color: isSelected
+                      ? theme.colorScheme.primary
+                      : theme.colorScheme.outlineVariant,
+                ),
+              ),
+              child: Text(
+                option,
+                textAlign: TextAlign.center,
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  fontWeight: FontWeight.w600,
+                  color: isSelected ? Colors.white : theme.colorScheme.onSurface,
+                ),
+              ),
+            ),
+          ),
+        );
+      }).toList(),
     );
   }
 }
@@ -219,9 +278,6 @@ class _IntentSelector extends StatelessWidget {
   }
 }
 
-// ─────────────────────────────────────────────
-// Step 3: Personalization
-// ─────────────────────────────────────────────
 class PersonalizationStep extends ConsumerWidget {
   const PersonalizationStep({super.key});
 
@@ -402,10 +458,8 @@ class MediaStep extends ConsumerWidget {
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(14.r),
                       color: theme.colorScheme.surfaceContainerHighest,
-                      image: const DecorationImage(
-                        image: NetworkImage(
-                          'https://picsum.photos/150?random=1',
-                        ),
+                      image: DecorationImage(
+                        image: FileImage(File(state.photos[index])),
                         fit: BoxFit.cover,
                       ),
                     ),
@@ -417,7 +471,7 @@ class MediaStep extends ConsumerWidget {
                       onTap: () => notifier.removePhoto(state.photos[index]),
                       child: Container(
                         padding: EdgeInsets.all(4.r),
-                        decoration: BoxDecoration(
+                        decoration: const BoxDecoration(
                           color: Colors.black54,
                           shape: BoxShape.circle,
                         ),
@@ -433,7 +487,7 @@ class MediaStep extends ConsumerWidget {
               );
             }
             return GestureDetector(
-              onTap: () => notifier.addPhoto('dummy_path'),
+              onTap: () => _showImageSourceActionSheet(context, notifier),
               child: Container(
                 decoration: BoxDecoration(
                   color: theme.colorScheme.primary.withOpacity(0.06),
@@ -472,76 +526,57 @@ class MediaStep extends ConsumerWidget {
           style: theme.textTheme.bodyMedium,
         ),
         14.verticalSpace,
-        _AudioBioButton(state: state.audioBioPath),
+        AudioBioEditor(
+          initialLocalPath: state.audioBioPath,
+          onAudioChanged: (path) => notifier.updateAudioBio(path),
+        ),
       ],
     );
   }
-}
 
-class _AudioBioButton extends StatelessWidget {
-  final String? state;
-  const _AudioBioButton({this.state});
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final hasRecording = state != null;
-    return Container(
-      width: double.infinity,
-      padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 16.h),
-      decoration: BoxDecoration(
-        color: hasRecording
-            ? theme.colorScheme.primary.withOpacity(0.08)
-            : theme.colorScheme.surface,
-        borderRadius: BorderRadius.circular(16.r),
-        border: Border.all(
-          color: hasRecording
-              ? theme.colorScheme.primary
-              : theme.colorScheme.outlineVariant,
+  void _showImageSourceActionSheet(
+    BuildContext context,
+    OnboardingNotifier notifier,
+  ) {
+    showModalBottomSheet(
+      context: context,
+      builder: (context) => SafeArea(
+        child: Wrap(
+          children: [
+            ListTile(
+              leading: const Icon(Icons.photo_library),
+              title: const Text('Gallery'),
+              onTap: () {
+                Navigator.pop(context);
+                _pickImage(ImageSource.gallery, notifier);
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.photo_camera),
+              title: const Text('Camera'),
+              onTap: () {
+                Navigator.pop(context);
+                _pickImage(ImageSource.camera, notifier);
+              },
+            ),
+          ],
         ),
       ),
-      child: Row(
-        children: [
-          Container(
-            padding: EdgeInsets.all(10.r),
-            decoration: BoxDecoration(
-              color: theme.colorScheme.primary.withOpacity(0.12),
-              shape: BoxShape.circle,
-            ),
-            child: Icon(
-              hasRecording ? Icons.play_arrow_rounded : Icons.mic_rounded,
-              color: theme.colorScheme.primary,
-              size: 22.r,
-            ),
-          ),
-          14.horizontalSpace,
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  hasRecording ? 'Recording saved' : 'Record Introduction',
-                  style: theme.textTheme.bodyLarge?.copyWith(
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-                4.verticalSpace,
-                Text(
-                  hasRecording
-                      ? 'Tap to listen or re-record'
-                      : '10–30 seconds • Tap to start',
-                  style: theme.textTheme.bodyMedium,
-                ),
-              ],
-            ),
-          ),
-          Icon(
-            Icons.chevron_right_rounded,
-            color: theme.colorScheme.onSurface.withOpacity(0.4),
-          ),
-        ],
-      ),
     );
+  }
+
+  Future<void> _pickImage(
+    ImageSource source,
+    OnboardingNotifier notifier,
+  ) async {
+    final ImagePicker picker = ImagePicker();
+    final XFile? image = await picker.pickImage(
+      source: source,
+      imageQuality: 70,
+    );
+    if (image != null) {
+      notifier.addPhoto(image.path);
+    }
   }
 }
 

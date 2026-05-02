@@ -76,186 +76,190 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
-        child: SingleChildScrollView(
-          padding: EdgeInsets.symmetric(horizontal: 24.w),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Text(
-                "Amora",
-                style: Theme.of(context).textTheme.headlineLarge?.copyWith(
-                  color: Theme.of(context).colorScheme.primary,
+        child: Center(
+          child: Padding(
+            padding: EdgeInsets.symmetric(horizontal: 24.w),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Text(
+                  "Amora",
+                  style: Theme.of(context).textTheme.headlineLarge?.copyWith(
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
                 ),
-              ),
 
-              20.verticalSpace,
-              // Welcome Text
-              Text(
-                'Welcome Back',
-                style: Theme.of(context).textTheme.headlineMedium,
-              ),
-              8.verticalSpace,
-              Text(
-                'Sign in to continue your journey of connection.',
-                style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                  color: const Color(0xFF8A7174),
-                  fontSize: 14.sp,
-                  letterSpacing: 0.3,
-                  height: 1.7,
-                  fontWeight: FontWeight.bold,
+                20.verticalSpace,
+                // Welcome Text
+                Text(
+                  'Welcome Back',
+                  style: Theme.of(context).textTheme.headlineMedium,
                 ),
-                textAlign: TextAlign.center,
-              ),
-              30.verticalSpace,
+                8.verticalSpace,
+                Text(
+                  'Sign in to continue your journey of connection.',
+                  style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                    color: const Color(0xFF8A7174),
+                    fontSize: 14.sp,
+                    letterSpacing: 0.3,
+                    height: 1.7,
+                    fontWeight: FontWeight.bold,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                30.verticalSpace,
 
-              if (_errorMessage != null)
-                Padding(
-                  padding: EdgeInsets.only(bottom: 15.h),
-                  child: Container(
-                    padding: EdgeInsets.all(12.r),
-                    decoration: BoxDecoration(
-                      color: Theme.of(
-                        context,
-                      ).colorScheme.error.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(8.r),
-                      border: Border.all(
+                if (_errorMessage != null)
+                  Padding(
+                    padding: EdgeInsets.only(bottom: 15.h),
+                    child: Container(
+                      padding: EdgeInsets.all(12.r),
+                      decoration: BoxDecoration(
                         color: Theme.of(
                           context,
-                        ).colorScheme.error.withOpacity(0.5),
-                      ),
-                    ),
-                    child: Row(
-                      children: [
-                        Icon(
-                          Icons.error_outline,
-                          color: Theme.of(context).colorScheme.error,
-                          size: 20.r,
+                        ).colorScheme.error.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(8.r),
+                        border: Border.all(
+                          color: Theme.of(
+                            context,
+                          ).colorScheme.error.withOpacity(0.5),
                         ),
-                        10.horizontalSpace,
-                        Expanded(
-                          child: Text(
-                            _errorMessage!,
-                            style: TextStyle(
-                              color: Theme.of(context).colorScheme.error,
-                              fontSize: 13.sp,
+                      ),
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.error_outline,
+                            color: Theme.of(context).colorScheme.error,
+                            size: 20.r,
+                          ),
+                          10.horizontalSpace,
+                          Expanded(
+                            child: Text(
+                              _errorMessage!,
+                              style: TextStyle(
+                                color: Theme.of(context).colorScheme.error,
+                                fontSize: 13.sp,
+                              ),
                             ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
+
+                BuildTextField(
+                  label: 'Email Address',
+                  hintText: 'hello@amora.com',
+                  onChanged: (val) => _email = val,
+                ),
+                20.verticalSpace,
+                BuildTextField(
+                  label: 'Password',
+                  hintText: '••••••••',
+                  isPassword: true,
+                  onChanged: (val) => _password = val,
+                ),
+                10.verticalSpace,
+                // Forgot Password
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: TextButton(
+                    onPressed: () {},
+                    child: Text(
+                      'Forgot Password?',
+                      style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                        wordSpacing: 2.5,
+                        fontWeight: FontWeight.w100,
+                      ),
+                    ),
+                  ),
+                ),
+                20.verticalSpace,
+                // Login Button
+                ElevatedButton(
+                  onPressed: _isLoading ? null : _handleLogin,
+                  style: Theme.of(context).elevatedButtonTheme.style,
+                  child: _isLoading
+                      ? SizedBox(
+                          height: 20.r,
+                          width: 20.r,
+                          child: const CircularProgressIndicator(
+                            color: Colors.white,
+                            strokeWidth: 2.5,
+                          ),
+                        )
+                      : Text(
+                          "Login",
+                          style: Theme.of(context).textTheme.bodyLarge
+                              ?.copyWith(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                              ),
+                        ),
+                ),
+                30.verticalSpace,
+                // Divider
+                Row(
+                  children: [
+                    Expanded(child: Divider(color: Colors.grey[300])),
+                    Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 16.w),
+                      child: Text(
+                        'or continue with',
+                        style: TextStyle(
+                          color: AppColors.textSecondary,
+                          fontSize: 14.sp,
+                        ),
+                      ),
+                    ),
+                    Expanded(child: Divider(color: Colors.grey[300])),
+                  ],
+                ),
+                30.verticalSpace,
+
+                buildSocialButton(
+                  label: 'Google',
+                  icon: Icons.g_mobiledata, // Placeholder for Google logo
+                  color: Colors.white,
+                  textColor: AppColors.textPrimary,
                 ),
 
-              BuildTextField(
-                label: 'Email Address',
-                hintText: 'hello@amora.com',
-                onChanged: (val) => _email = val,
-              ),
-              20.verticalSpace,
-              BuildTextField(
-                label: 'Password',
-                hintText: '••••••••',
-                isPassword: true,
-                onChanged: (val) => _password = val,
-              ),
-              10.verticalSpace,
-              // Forgot Password
-              Align(
-                alignment: Alignment.centerRight,
-                child: TextButton(
-                  onPressed: () {},
-                  child: Text(
-                    'Forgot Password?',
-                    style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                      wordSpacing: 2.5,
-                      fontWeight: FontWeight.w100,
+                30.verticalSpace,
+                // Sign Up Link
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      'New to Amora? ',
+                      style: TextStyle(
+                        color: AppColors.textPrimary,
+                        fontSize: 14.sp,
+                      ),
                     ),
-                  ),
-                ),
-              ),
-              20.verticalSpace,
-              // Login Button
-              ElevatedButton(
-                onPressed: _isLoading ? null : _handleLogin,
-                style: Theme.of(context).elevatedButtonTheme.style,
-                child: _isLoading
-                    ? SizedBox(
-                        height: 20.r,
-                        width: 20.r,
-                        child: const CircularProgressIndicator(
-                          color: Colors.white,
-                          strokeWidth: 2.5,
-                        ),
-                      )
-                    : Text(
-                        "Login",
-                        style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                          color: Colors.white,
+                    2.horizontalSpace,
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.of(context).pushReplacement(
+                          MaterialPageRoute(
+                            builder: (context) => const OnboardingScreen(),
+                          ),
+                        );
+                      },
+                      child: Text(
+                        'Sign Up',
+                        style: TextStyle(
+                          color: AppColors.primary,
                           fontWeight: FontWeight.bold,
+                          fontSize: 14.sp,
                         ),
                       ),
-              ),
-              30.verticalSpace,
-              // Divider
-              Row(
-                children: [
-                  Expanded(child: Divider(color: Colors.grey[300])),
-                  Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 16.w),
-                    child: Text(
-                      'or continue with',
-                      style: TextStyle(
-                        color: AppColors.textSecondary,
-                        fontSize: 14.sp,
-                      ),
                     ),
-                  ),
-                  Expanded(child: Divider(color: Colors.grey[300])),
-                ],
-              ),
-              30.verticalSpace,
-
-              buildSocialButton(
-                label: 'Google',
-                icon: Icons.g_mobiledata, // Placeholder for Google logo
-                color: Colors.white,
-                textColor: AppColors.textPrimary,
-              ),
-
-              30.verticalSpace,
-              // Sign Up Link
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    'New to Amora? ',
-                    style: TextStyle(
-                      color: AppColors.textPrimary,
-                      fontSize: 14.sp,
-                    ),
-                  ),
-                  2.horizontalSpace,
-                  GestureDetector(
-                    onTap: () {
-                      Navigator.of(context).pushReplacement(
-                        MaterialPageRoute(
-                          builder: (context) => const OnboardingScreen(),
-                        ),
-                      );
-                    },
-                    child: Text(
-                      'Sign Up',
-                      style: TextStyle(
-                        color: AppColors.primary,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 14.sp,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              20.verticalSpace,
-            ],
+                  ],
+                ),
+                20.verticalSpace,
+              ],
+            ),
           ),
         ),
       ),

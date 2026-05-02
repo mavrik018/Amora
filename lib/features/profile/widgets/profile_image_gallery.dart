@@ -44,7 +44,7 @@ class _ProfileImageGalleryState extends State<ProfileImageGallery> {
             itemBuilder: (context, index) {
               return Image.network(
                 widget.images[index],
-                fit: BoxFit.cover,
+                fit: BoxFit.contain,
                 loadingBuilder: (context, child, loadingProgress) {
                   if (loadingProgress == null) return child;
                   return Container(
