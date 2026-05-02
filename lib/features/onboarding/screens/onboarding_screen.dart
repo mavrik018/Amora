@@ -175,6 +175,11 @@ class OnboardingScreen extends HookConsumerWidget {
                           } else if (latestState.dob == null) {
                             validationError =
                                 'Please select your date of birth.';
+                          } else if (latestState.gender.isEmpty) {
+                            validationError = 'Please select your gender.';
+                          } else if (latestState.interestedIn.isEmpty) {
+                            validationError =
+                                'Please select who you are interested in.';
                           } else if (latestState.relationshipIntent == null) {
                             validationError =
                                 'Please select your relationship intent.';
@@ -220,7 +225,9 @@ class OnboardingScreen extends HookConsumerWidget {
                           }
                           await notifier.signUp();
                           if (context.mounted) {
-                            final afterSignUpState = ref.read(onboardingProvider);
+                            final afterSignUpState = ref.read(
+                              onboardingProvider,
+                            );
                             if (afterSignUpState.errorMessage == null) {
                               Navigator.of(context).pushAndRemoveUntil(
                                 MaterialPageRoute(

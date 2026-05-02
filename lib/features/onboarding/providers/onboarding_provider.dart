@@ -1,3 +1,5 @@
+import 'dart:io';
+import 'package:path/path.dart' as path;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -136,13 +138,13 @@ class OnboardingNotifier extends StateNotifier<OnboardingState> {
     );
   }
 
-  void updateAudioBio(String path) =>
+  void updateAudioBio(String? path) =>
       state = state.copyWith(audioBioPath: path);
 
   Future<void> signUp() async {
     state = state.copyWith(isLoading: true, errorMessage: null);
     try {
-      final supabase = _ref.read(supabaseProvider);
+      final supabase = _ref.read(supabaseClientProvider);
       final profileRepo = _ref.read(profileRepositoryProvider);
 
       final response = await supabase.auth.signUp(
@@ -151,8 +153,37 @@ class OnboardingNotifier extends StateNotifier<OnboardingState> {
       );
 
       if (response.user != null) {
+        final userId = response.user!.id;
+        final List<String> uploadedPhotoUrls = [];
+
+        // Upload photos
+        for (String photoPath in state.photos) {
+          final file = File(photoPath);
+          final fileName =
+              '$userId/${DateTime.now().millisecondsSinceEpoch}${path.extension(photoPath)}';
+
+          await supabase.storage.from('profiles').upload(fileName, file);
+          final publicUrl = supabase.storage
+              .from('profiles')
+              .getPublicUrl(fileName);
+          uploadedPhotoUrls.add(publicUrl);
+        }
+
+        // Upload audio bio if exists
+        String? uploadedAudioUrl;
+        if (state.audioBioPath != null && state.audioBioPath!.isNotEmpty) {
+          final file = File(state.audioBioPath!);
+          final fileName =
+              '$userId/audio_bio_${DateTime.now().millisecondsSinceEpoch}.m4a';
+
+          await supabase.storage.from('profiles').upload(fileName, file);
+          uploadedAudioUrl = supabase.storage
+              .from('profiles')
+              .getPublicUrl(fileName);
+        }
+
         final profile = ProfileModel(
-          id: response.user!.id,
+          id: userId,
           fullName: state.fullName,
           dob: state.dob,
           gender: state.gender,
@@ -160,7 +191,8 @@ class OnboardingNotifier extends StateNotifier<OnboardingState> {
           relationshipIntent: state.relationshipIntent,
           interests: state.interests,
           prompts: state.prompts,
-          photos: state.photos,
+          photos: uploadedPhotoUrls,
+          audioBioUrl: uploadedAudioUrl,
           latitude: state.latitude,
           longitude: state.longitude,
         );
