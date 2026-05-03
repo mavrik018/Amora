@@ -29,12 +29,15 @@ class _AdminVerificationCardState extends ConsumerState<AdminVerificationCard> {
       }
     } catch (e) {
       if (mounted) {
-        setState(() => _isProcessing = false);
         CustomSnackBar.show(
           context,
           message: 'Error: $e',
           type: SnackBarType.error,
         );
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isProcessing = false);
       }
     }
   }
@@ -79,12 +82,15 @@ class _AdminVerificationCardState extends ConsumerState<AdminVerificationCard> {
         }
       } catch (e) {
         if (mounted) {
-          setState(() => _isProcessing = false);
           CustomSnackBar.show(
             context,
             message: 'Error: $e',
             type: SnackBarType.error,
           );
+        }
+      } finally {
+        if (mounted) {
+          setState(() => _isProcessing = false);
         }
       }
     }

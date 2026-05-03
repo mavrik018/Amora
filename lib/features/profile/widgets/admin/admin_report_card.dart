@@ -52,12 +52,15 @@ class _AdminReportCardState extends ConsumerState<AdminReportCard> {
       }
     } catch (e) {
       if (mounted) {
-        setState(() => _isDismissing = false);
         CustomSnackBar.show(
           context,
           message: 'Failed to dismiss: $e',
           type: SnackBarType.error,
         );
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isDismissing = false);
       }
     }
   }
