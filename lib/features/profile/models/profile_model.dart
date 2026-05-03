@@ -19,6 +19,7 @@ class ProfileModel {
   final String? statusToday;
   final bool isBanned;
   final bool isAdmin;
+  final bool isVerified;
 
   int? get age {
     if (dob == null) return null;
@@ -50,6 +51,7 @@ class ProfileModel {
     this.statusToday,
     this.isBanned = false,
     this.isAdmin = false,
+    this.isVerified = false,
   });
 
   ProfileModel copyWith({
@@ -71,6 +73,7 @@ class ProfileModel {
     String? statusToday,
     bool? isBanned,
     bool? isAdmin,
+    bool? isVerified,
   }) {
     return ProfileModel(
       id: id ?? this.id,
@@ -91,6 +94,7 @@ class ProfileModel {
       statusToday: statusToday ?? this.statusToday,
       isBanned: isBanned ?? this.isBanned,
       isAdmin: isAdmin ?? this.isAdmin,
+      isVerified: isVerified ?? this.isVerified,
     );
   }
 
@@ -111,6 +115,7 @@ class ProfileModel {
       'status_today': statusToday,
       'is_banned': isBanned,
       'is_admin': isAdmin,
+      'is_verified': isVerified,
     };
 
     if (latitude != null && longitude != null) {
@@ -123,7 +128,7 @@ class ProfileModel {
   factory ProfileModel.fromJson(Map<String, dynamic> json) {
     return ProfileModel(
       id: json['id'],
-      fullName: json['full_name'],
+      fullName: json['full_name'] ?? '',
       dob: json['dob'] != null ? DateTime.parse(json['dob']) : null,
       gender: json['gender'] ?? '',
       interestedIn: json['interested_in'] ?? '',
@@ -147,6 +152,7 @@ class ProfileModel {
       statusToday: json['status_today'],
       isBanned: json['is_banned'] ?? false,
       isAdmin: json['is_admin'] ?? false,
+      isVerified: json['is_verified'] ?? false,
     );
   }
 }

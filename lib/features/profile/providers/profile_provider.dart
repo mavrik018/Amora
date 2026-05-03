@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../repositories/profile_repository.dart';
 import '../../../core/providers/supabase_provider.dart';
 import '../models/profile_model.dart';
+import '../models/verification_request_model.dart';
 
 final profileRepositoryProvider = Provider<ProfileRepository>((ref) {
   final client = ref.watch(supabaseClientProvider);
@@ -18,4 +19,14 @@ final userProfileProvider = FutureProvider<ProfileModel?>((ref) async {
   if (userId == null) return null;
 
   return repository.getProfile(userId);
+});
+
+final userVerificationProvider = FutureProvider<VerificationRequestModel?>((ref) async {
+  final repository = ref.watch(profileRepositoryProvider);
+  final client = ref.watch(supabaseClientProvider);
+  final userId = client.auth.currentUser?.id;
+
+  if (userId == null) return null;
+
+  return repository.getVerificationRequest(userId);
 });

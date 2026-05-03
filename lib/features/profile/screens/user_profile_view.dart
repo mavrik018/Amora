@@ -1,3 +1,4 @@
+import 'package:amora/features/profile/models/profile_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -12,6 +13,7 @@ import '../widgets/profile_prompt_cards.dart';
 import '../widgets/profile_interests_section.dart';
 import 'admin_screen.dart';
 import '../providers/admin_provider.dart';
+import 'verification_request_screen.dart';
 
 class UserProfileView extends ConsumerWidget {
   const UserProfileView({super.key});
@@ -50,6 +52,8 @@ class UserProfileView extends ConsumerWidget {
                           ProfilePromptCards(prompts: profile.prompts),
                           SizedBox(height: 24.h),
                           ProfileInterestsSection(interests: profile.interests),
+                          SizedBox(height: 32.h),
+                          _VerificationStatusCard(profile: profile),
                           SizedBox(height: 40.h),
                           Center(
                             child: TextButton.icon(
@@ -166,6 +170,121 @@ class UserProfileView extends ConsumerWidget {
         loading: () => null,
         error: (err, stack) => null,
       ),
+    );
+  }
+}
+
+class _VerificationStatusCard extends ConsumerWidget {
+  final ProfileModel profile;
+  const _VerificationStatusCard({required this.profile});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final theme = Theme.of(context);
+    final verificationAsync = ref.watch(userVerificationProvider);
+
+    if (profile.isVerified) {
+      return Container(
+        padding: EdgeInsets.all(16.w),
+        decoration: BoxDecoration(
+          color: Colors.green.withOpacity(0.1),
+          borderRadius: BorderRadius.circular(16.r),
+          border: Border.all(color: Colors.green.withOpacity(0.3)),
+        ),
+        child: Row(
+          children: [
+            const Icon(Icons.verified_rounded, color: Colors.green),
+            SizedBox(width: 12.w),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Verified Account',
+                    style: theme.textTheme.titleSmall?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: Colors.green,
+                    ),
+                  ),
+                  Text(
+                    'Your identity has been confirmed.',
+                    style: theme.textTheme.bodySmall,
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
+    return verificationAsync.when(
+      data: (request) {
+        String title = 'Verify Identity';
+        String subtitle = 'Get a verification badge and build trust.';
+        IconData icon = Icons.admin_panel_settings_outlined;
+        Color color = theme.colorScheme.primary;
+
+        if (request != null) {
+          if (request.status == 'pending') {
+            title = 'Verification Pending';
+            subtitle = 'We are reviewing your ID.';
+            icon = Icons.hourglass_empty_rounded;
+            color = Colors.orange;
+          } else if (request.status == 'rejected') {
+            title = 'Verification Failed';
+            subtitle = 'Tap to see reason and try again.';
+            icon = Icons.error_outline_rounded;
+            color = theme.colorScheme.error;
+          }
+        }
+
+        return InkWell(
+          onTap: () {
+            Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (context) => const VerificationRequestScreen(),
+              ),
+            );
+          },
+          borderRadius: BorderRadius.circular(16.r),
+          child: Container(
+            padding: EdgeInsets.all(16.w),
+            decoration: BoxDecoration(
+              color: color.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(16.r),
+              border: Border.all(color: color.withOpacity(0.3)),
+            ),
+            child: Row(
+              children: [
+                Icon(icon, color: color),
+                SizedBox(width: 12.w),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        title,
+                        style: theme.textTheme.titleSmall?.copyWith(
+                          fontWeight: FontWeight.bold,
+                          color: color,
+                        ),
+                      ),
+                      Text(subtitle, style: theme.textTheme.bodySmall),
+                    ],
+                  ),
+                ),
+                Icon(
+                  Icons.chevron_right_rounded,
+                  color: color.withOpacity(0.5),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+      loading: () => const SizedBox.shrink(),
+      error: (_, __) => const SizedBox.shrink(),
     );
   }
 }

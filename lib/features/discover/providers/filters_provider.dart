@@ -13,7 +13,7 @@ class DiscoveryFilters {
     this.maxAge = 65,
     this.distance = 10000,
     this.gender = 'Non-binary',
-    this.verifiedOnly = true,
+    this.verifiedOnly = false,
   });
 
   DiscoveryFilters copyWith({

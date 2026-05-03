@@ -123,12 +123,14 @@ class DiscoverGridCard extends StatelessWidget {
                           overflow: TextOverflow.ellipsis,
                         ),
                       ),
-                      SizedBox(width: 6.w),
-                      Icon(
-                        Icons.verified,
-                        color: theme.colorScheme.secondary,
-                        size: 18.w,
-                      ),
+                      if (profile.isVerified) ...[
+                        SizedBox(width: 6.w),
+                        Icon(
+                          Icons.verified,
+                          color: theme.colorScheme.secondary,
+                          size: 18.w,
+                        ),
+                      ],
                     ],
                   ),
                   SizedBox(height: 4.h),

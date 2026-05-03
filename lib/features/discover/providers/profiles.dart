@@ -34,6 +34,7 @@ final otherProfilesProvider = FutureProvider<List<ProfileModel>>((ref) async {
         lat: userProfile.latitude!,
         lng: userProfile.longitude!,
         radiusKm: filters.distance,
+        verifiedOnly: filters.verifiedOnly,
       );
     } catch (e) {
       print('Discovery: RPC error, falling back: $e');
@@ -133,6 +134,11 @@ List<ProfileModel> _applyClientFilters(
       );
       return (distanceInMeters / 1000) <= filters.distance;
     }).toList();
+  }
+
+  // Verified Only Filter
+  if (filters.verifiedOnly) {
+    filtered = filtered.where((p) => p.isVerified).toList();
   }
 
   return filtered;

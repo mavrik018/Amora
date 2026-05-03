@@ -56,8 +56,10 @@ class ProfileHeaderInfo extends StatelessWidget {
                           overflow: TextOverflow.ellipsis,
                         ),
                       ),
-                      SizedBox(width: 8.w),
-                      Icon(Icons.verified, color: Colors.blue, size: 22.sp),
+                      if (profile.isVerified) ...[
+                        SizedBox(width: 8.w),
+                        Icon(Icons.verified, color: Colors.blue, size: 22.sp),
+                      ],
                     ],
                   ),
                 ],

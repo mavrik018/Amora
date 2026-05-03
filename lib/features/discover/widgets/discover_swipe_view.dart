@@ -131,12 +131,14 @@ class DiscoverSwipeCard extends StatelessWidget {
                           overflow: TextOverflow.ellipsis,
                         ),
                       ),
-                      SizedBox(width: 8.w),
-                      Icon(
-                        Icons.verified,
-                        color: theme.colorScheme.secondary,
-                        size: 24.w,
-                      ),
+                      if (profile.isVerified) ...[
+                        SizedBox(width: 8.w),
+                        Icon(
+                          Icons.verified,
+                          color: theme.colorScheme.secondary,
+                          size: 24.w,
+                        ),
+                      ],
                     ],
                   ),
                   SizedBox(height: 8.h),

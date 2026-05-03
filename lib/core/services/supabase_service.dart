@@ -30,6 +30,7 @@ class SupabaseService {
     required double lat,
     required double lng,
     required double radiusKm,
+    required bool verifiedOnly,
   }) async {
     final userID = user?.id;
     if (userID == null) return [];
@@ -44,6 +45,7 @@ class SupabaseService {
         'p_lat': lat,
         'p_lng': lng,
         'p_radius_km': radiusKm,
+        'p_verified_only': verifiedOnly,
       },
     );
 
