@@ -103,9 +103,6 @@ class ProfileModel {
   }
 
   factory ProfileModel.fromJson(Map<String, dynamic> json) {
-    final location = json['location'] as String?;
-    final coords = _parseLocationPoint(location);
-
     return ProfileModel(
       id: json['id'],
       fullName: json['full_name'],
@@ -120,38 +117,11 @@ class ProfileModel {
       photos: List<String>.from(json['photos'] ?? []),
       audioBioUrl: json['audio_bio_url'],
       locationName: json['location_name'],
-      latitude: json['latitude'] != null
-          ? (json['latitude'] as num).toDouble()
-          : coords?.latitude,
-      longitude: json['longitude'] != null
-          ? (json['longitude'] as num).toDouble()
-          : coords?.longitude,
+      latitude: json['latitude'] != null ? (json['latitude'] as num).toDouble() : null,
+      longitude: json['longitude'] != null ? (json['longitude'] as num).toDouble() : null,
       savedLocations: List<Map<String, dynamic>>.from(
         json['saved_locations'] ?? [],
       ),
     );
   }
-
-  static _LatLng? _parseLocationPoint(String? location) {
-    if (location == null || location.isEmpty) return null;
-
-    // Accept formats like 'POINT(lon lat)' or 'SRID=4326;POINT(lon lat)'
-    final normalized = location.replaceAll('SRID=4326;', '');
-    final match = RegExp(
-      r'POINT\s*\(([-0-9\.]+)\s+([-0-9\.]+)\)',
-    ).firstMatch(normalized);
-    if (match == null) return null;
-
-    final lon = double.tryParse(match.group(1)!);
-    final lat = double.tryParse(match.group(2)!);
-    if (lon == null || lat == null) return null;
-    return _LatLng(latitude: lat, longitude: lon);
-  }
-}
-
-class _LatLng {
-  final double latitude;
-  final double longitude;
-
-  const _LatLng({required this.latitude, required this.longitude});
 }
