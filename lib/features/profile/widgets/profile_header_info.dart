@@ -21,13 +21,13 @@ class ProfileHeaderInfo extends StatelessWidget {
   String _getIntentLabel(RelationshipIntent? intent) {
     switch (intent) {
       case RelationshipIntent.serious:
-        return 'Seeking Serious';
+        return 'Serious Match';
       case RelationshipIntent.casual:
-        return 'Casual Fun';
+        return 'Casual Dating';
       case RelationshipIntent.openToBoth:
-        return 'Open To Both';
+        return 'Open to Either';
       default:
-        return 'Connecting';
+        return 'Looking Around';
     }
   }
 

@@ -16,20 +16,23 @@ class ActiveFiltersList extends ConsumerWidget {
 
     final List<Widget> chips = [];
 
-    // Age chip
-    chips.add(
-      _buildFilterChip(
-        theme,
-        '${filters.minAge.round()}-${filters.maxAge.round()}',
-        onDelete: () {
-          filterNotifier.setAgeRange(const RangeValues(18, 24));
-        },
-      ),
-    );
+    // Age chip (only if not default 18-65)
+    if (filters.minAge != 18 || filters.maxAge != 65) {
+      if (chips.isNotEmpty) chips.add(SizedBox(width: 8.w));
+      chips.add(
+        _buildFilterChip(
+          theme,
+          '${filters.minAge.round()}-${filters.maxAge.round()}',
+          onDelete: () {
+            filterNotifier.setAgeRange(const RangeValues(18, 65));
+          },
+        ),
+      );
+    }
 
     // Verified chip
     if (filters.verifiedOnly) {
-      chips.add(SizedBox(width: 8.w));
+      if (chips.isNotEmpty) chips.add(SizedBox(width: 8.w));
       chips.add(
         _buildFilterChip(
           theme,
@@ -41,37 +44,43 @@ class ActiveFiltersList extends ConsumerWidget {
       );
     }
 
-    // Distance/Location chip
-    final locationName = userProfile?.locationName ?? 'Location';
-    chips.add(SizedBox(width: 8.w));
-    chips.add(
-      _buildFilterChip(
-        theme,
-        '$locationName +${filters.distance.round()}km',
-        onDelete: () {
-          filterNotifier.setDistance(50);
-        },
-      ),
-    );
+    // Distance/Location chip (only if not default 10000km)
+    if (filters.distance < 10000) {
+      final locationName = userProfile?.locationName ?? 'Nearby';
+      if (chips.isNotEmpty) chips.add(SizedBox(width: 8.w));
+      chips.add(
+        _buildFilterChip(
+          theme,
+          '$locationName +${filters.distance.round()}km',
+          onDelete: () {
+            filterNotifier.setDistance(10000);
+          },
+        ),
+      );
+    }
 
-    // Gender chip
-    chips.add(SizedBox(width: 8.w));
-    chips.add(
-      _buildFilterChip(
-        theme,
-        filters.gender,
-        onDelete: () {
-          // Maybe don't delete gender but reset to default
-          filterNotifier.setGender('Woman');
-        },
-      ),
-    );
+    // Gender chip (only if not default 'Non-binary')
+    if (filters.gender != 'Non-binary') {
+      if (chips.isNotEmpty) chips.add(SizedBox(width: 8.w));
+      chips.add(
+        _buildFilterChip(
+          theme,
+          filters.gender,
+          onDelete: () {
+            filterNotifier.setGender('Non-binary');
+          },
+        ),
+      );
+    }
+
+    if (chips.isEmpty) return const SizedBox.shrink();
 
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
       padding: EdgeInsets.symmetric(horizontal: 20.w),
       child: Row(children: chips),
     );
+
   }
 
   Widget _buildFilterChip(

@@ -94,7 +94,7 @@ class DiscoverSwipeCard extends StatelessWidget {
                     Icon(Icons.favorite, color: theme.primaryColor, size: 16.w),
                     SizedBox(width: 4.w),
                     Text(
-                      '${80 + index * 3}% Match',
+                      '${profile.compatibilityScore ?? 0}% Match',
                       style:
                           theme.textTheme.labelLarge?.copyWith(
                             color: theme.primaryColor,
@@ -158,24 +158,7 @@ class DiscoverSwipeCard extends StatelessWidget {
                     ],
                   ),
                   SizedBox(height: 16.h),
-                  // Action Buttons
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      _buildActionButton(
-                        Icons.close,
-                        Colors.white,
-                        Colors.redAccent,
-                        64.w,
-                      ),
-                      _buildActionButton(
-                        Icons.favorite,
-                        theme.primaryColor,
-                        Colors.white,
-                        80.w,
-                      ),
-                    ],
-                  ),
+                  // Action Buttons removed to provide a common interface
                 ],
               ),
             ),
@@ -185,29 +168,4 @@ class DiscoverSwipeCard extends StatelessWidget {
     );
   }
 
-  Widget _buildActionButton(
-    IconData icon,
-    Color bgColor,
-    Color iconColor,
-    double size,
-  ) {
-    return Container(
-      width: size,
-      height: size,
-      decoration: BoxDecoration(
-        color: bgColor,
-        shape: BoxShape.circle,
-        boxShadow: const [
-          BoxShadow(
-            color: Colors.black26,
-            blurRadius: 10,
-            offset: Offset(0, 5),
-          ),
-        ],
-      ),
-      child: Center(
-        child: Icon(icon, color: iconColor, size: size * 0.45),
-      ),
-    );
-  }
 }

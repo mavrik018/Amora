@@ -1,3 +1,4 @@
+import 'package:amora/core/constants/enums.dart';
 import 'package:amora/core/services/supabase_service.dart';
 import 'package:amora/features/discover/providers/filters_provider.dart';
 import 'package:amora/features/profile/models/profile_model.dart';
@@ -13,14 +14,16 @@ final otherProfilesProvider = FutureProvider<List<ProfileModel>>((ref) async {
   final service = ref.read(supabaseServiceProvider);
   final filters = ref.watch(discoveryFiltersProvider);
   final userProfileAsync = ref.watch(userProfileProvider);
-
   final userProfile = userProfileAsync.value;
 
+  List<ProfileModel> profiles = [];
+
+  // 1. Fetch Profiles (via RPC or Table Select)
   if (userProfile != null &&
       userProfile.latitude != null &&
       userProfile.longitude != null) {
     try {
-      final profiles = await service.getRecommendedProfiles(
+      profiles = await service.getRecommendedProfiles(
         gender: filters.gender,
         minAge: filters.minAge.toInt(),
         maxAge: filters.maxAge.toInt(),
@@ -28,64 +31,104 @@ final otherProfilesProvider = FutureProvider<List<ProfileModel>>((ref) async {
         lng: userProfile.longitude!,
         radiusKm: filters.distance,
       );
-      print('Discovery: Found ${profiles.length} profiles via RPC');
-      return profiles;
     } catch (e) {
-      print('Discovery: RPC error: $e');
-      // Fallback to client-side if RPC fails
+      print('Discovery: RPC error, falling back: $e');
+      final allProfiles = await service.getProfiles();
+      profiles = _applyClientFilters(allProfiles, filters, userProfile);
     }
   } else {
-    print(
-      'Discovery: No user coordinates found, falling back to client-side filtering. '
-      'User profile exists: ${userProfile != null}, '
-      'Lat: ${userProfile?.latitude}, Lng: ${userProfile?.longitude}',
+    final allProfiles = await service.getProfiles();
+    profiles = _applyClientFilters(allProfiles, filters, userProfile);
+  }
+
+  // 2. Complete Client-Side Compatibility Scoring
+  if (userProfile != null) {
+    profiles = profiles.map((p) {
+      int score = 0;
+
+      // A. Shared Interests (50%) - More lenient: even 1 match is a big boost
+      if (userProfile.interests.isNotEmpty) {
+        final sharedCount = p.interests
+            .where((i) => userProfile.interests.contains(i))
+            .length;
+
+        if (sharedCount > 0) {
+          // Give 25 points for the first match, and +10 for each additional one
+          score += (15 + (sharedCount * 10)).clamp(0, 50);
+        }
+      }
+
+      // B. Relationship Intent (30%) - Higher base for mismatches
+      if (p.relationshipIntent == userProfile.relationshipIntent) {
+        score += 30;
+      } else if (p.relationshipIntent == RelationshipIntent.openToBoth ||
+          userProfile.relationshipIntent == RelationshipIntent.openToBoth) {
+        score += 25;
+      } else {
+        score += 20; // Increased floor for intent mismatch
+      }
+
+      // C. Personality Prompt Completion (20%)
+      if (p.prompts.isNotEmpty) {
+        score += 20;
+      }
+
+      return p.copyWith(compatibilityScore: score);
+    }).toList();
+
+    // 3. Sort by Compatibility Score (Descending)
+    profiles.sort(
+      (a, b) =>
+          (b.compatibilityScore ?? 0).compareTo(a.compatibilityScore ?? 0),
     );
   }
 
-  // Fallback to client-side filtering if no location or RPC fails
-  final profiles = await service.getProfiles();
-  List<ProfileModel> filteredProfiles = profiles;
+  return profiles;
+});
 
-  // Filter by gender
+/// Helper to apply filters when RPC is not available or location is missing
+List<ProfileModel> _applyClientFilters(
+  List<ProfileModel> profiles,
+  DiscoveryFilters filters,
+  ProfileModel? userProfile,
+) {
+  List<ProfileModel> filtered = profiles;
+
+  // Gender Filter
   if (filters.gender != "Non-binary") {
-    filteredProfiles = filteredProfiles
-        .where((p) => p.gender == filters.gender)
-        .toList();
+    filtered = filtered.where((p) => p.gender == filters.gender).toList();
   }
 
-  // Filter by age
-  filteredProfiles = filteredProfiles.where((p) {
+  // Age Filter
+  filtered = filtered.where((p) {
     if (p.dob == null) return false;
     final age = _calculateAge(p.dob!);
     return age >= filters.minAge && age <= filters.maxAge;
   }).toList();
 
-  // Filter by distance (if we have user coordinates)
+  // Distance Filter
   if (userProfile != null &&
       userProfile.latitude != null &&
       userProfile.longitude != null) {
-    filteredProfiles = filteredProfiles.where((p) {
-      if (p.latitude == null || p.longitude == null) {
-        // Exclude profiles with no location when filtering strictly
-        return false;
-      }
-
+    filtered = filtered.where((p) {
+      if (p.latitude == null || p.longitude == null) return false;
       final distanceInMeters = Geolocator.distanceBetween(
         userProfile.latitude!,
         userProfile.longitude!,
         p.latitude!,
         p.longitude!,
       );
-
-      final distanceInKm = distanceInMeters / 1000;
-      return distanceInKm <= filters.distance;
+      return (distanceInMeters / 1000) <= filters.distance;
     }).toList();
-    print(
-      'Discovery: After client-side distance filter: ${filteredProfiles.length} profiles',
-    );
   }
 
-  return filteredProfiles;
+  return filtered;
+}
+
+final bestMatchProvider = FutureProvider<ProfileModel?>((ref) async {
+  final profiles = await ref.watch(otherProfilesProvider.future);
+  if (profiles.isEmpty) return null;
+  return profiles.first;
 });
 
 int _calculateAge(DateTime dob) {

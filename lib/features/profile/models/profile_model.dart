@@ -15,6 +15,7 @@ class ProfileModel {
   final double? longitude;
   final String? locationName;
   final List<Map<String, dynamic>> savedLocations;
+  final int? compatibilityScore;
 
   int? get age {
     if (dob == null) return null;
@@ -42,6 +43,7 @@ class ProfileModel {
     this.longitude,
     this.locationName,
     this.savedLocations = const [],
+    this.compatibilityScore,
   });
 
   ProfileModel copyWith({
@@ -59,6 +61,7 @@ class ProfileModel {
     double? longitude,
     String? locationName,
     List<Map<String, dynamic>>? savedLocations,
+    int? compatibilityScore,
   }) {
     return ProfileModel(
       id: id ?? this.id,
@@ -75,6 +78,7 @@ class ProfileModel {
       longitude: longitude ?? this.longitude,
       locationName: locationName ?? this.locationName,
       savedLocations: savedLocations ?? this.savedLocations,
+      compatibilityScore: compatibilityScore ?? this.compatibilityScore,
     );
   }
 
@@ -92,6 +96,7 @@ class ProfileModel {
       'audio_bio_url': audioBioUrl,
       'location_name': locationName,
       'saved_locations': savedLocations,
+      'compatibility_score': compatibilityScore,
     };
 
     if (latitude != null && longitude != null) {
@@ -110,18 +115,23 @@ class ProfileModel {
       gender: json['gender'] ?? '',
       interestedIn: json['interested_in'] ?? '',
       relationshipIntent: json['relationship_intent'] != null
-          ? RelationshipIntent.values.byName(json['relationship_intent'])
+          ? RelationshipIntent.fromString(json['relationship_intent'])
           : null,
       interests: List<String>.from(json['interests'] ?? []),
       prompts: Map<String, String>.from(json['prompts'] ?? {}),
       photos: List<String>.from(json['photos'] ?? []),
       audioBioUrl: json['audio_bio_url'],
       locationName: json['location_name'],
-      latitude: json['latitude'] != null ? (json['latitude'] as num).toDouble() : null,
-      longitude: json['longitude'] != null ? (json['longitude'] as num).toDouble() : null,
+      latitude: json['latitude'] != null
+          ? (json['latitude'] as num).toDouble()
+          : null,
+      longitude: json['longitude'] != null
+          ? (json['longitude'] as num).toDouble()
+          : null,
       savedLocations: List<Map<String, dynamic>>.from(
         json['saved_locations'] ?? [],
       ),
+      compatibilityScore: json['compatibility_score'],
     );
   }
 }

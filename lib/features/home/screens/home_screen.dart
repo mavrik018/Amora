@@ -1,14 +1,18 @@
-import 'package:amora/features/home/widgets/home_header.dart';
-import 'package:amora/features/home/widgets/profile_card.dart';
-import 'package:amora/features/home/widgets/seeAll.dart';
+import 'package:amora/features/discover/providers/profiles.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-class HomeScreen extends StatelessWidget {
+import '../widgets/home_header.dart';
+import '../widgets/profile_card.dart';
+import '../widgets/seeAll.dart';
+
+class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final bestMatchAsync = ref.watch(bestMatchProvider);
     return Scaffold(
       body: SafeArea(
         child: SingleChildScrollView(
@@ -71,7 +75,13 @@ class HomeScreen extends StatelessWidget {
               //   ),
               // ),
               SizedBox(height: 16.h),
-              const ProfileCard(),
+              bestMatchAsync.when(
+                data: (profile) => profile != null
+                    ? ProfileCard(profile: profile)
+                    : const Center(child: Text('No matches found yet')),
+                loading: () => const Center(child: CircularProgressIndicator()),
+                error: (e, _) => Center(child: Text('Error loading match: $e')),
+              ),
             ],
           ),
         ),

@@ -86,7 +86,7 @@ class DiscoverGridCard extends StatelessWidget {
                     Icon(Icons.favorite, color: theme.primaryColor, size: 12.w),
                     SizedBox(width: 4.w),
                     Text(
-                      '${80 + index * 3}%',
+                      '${profile.compatibilityScore ?? 0}%',
                       style:
                           theme.textTheme.labelLarge?.copyWith(
                             color: theme.primaryColor,

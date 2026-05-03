@@ -4,6 +4,7 @@ import 'package:amora/features/profile/widgets/profile_header_info.dart';
 import 'package:amora/features/profile/widgets/profile_image_gallery.dart';
 import 'package:amora/features/profile/widgets/profile_interests_section.dart';
 import 'package:amora/features/profile/widgets/profile_prompt_cards.dart';
+import 'package:amora/features/chat/providers/connection_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -44,6 +45,46 @@ class ProfilePage extends ConsumerWidget {
             ),
           ),
         ],
+      ),
+      bottomNavigationBar: SafeArea(
+        child: Padding(
+          padding: EdgeInsets.all(20.w),
+          child: ElevatedButton(
+            onPressed: () async {
+              try {
+                await ref
+                    .read(connectionProvider)
+                    .sendConnectionRequest(profile.id);
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Connection request sent!')),
+                  );
+                }
+              } catch (e) {
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Failed to send request: $e')),
+                  );
+                }
+              }
+            },
+            style: ElevatedButton.styleFrom(
+              padding: EdgeInsets.symmetric(vertical: 16.h),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(30.r),
+              ),
+              backgroundColor: Theme.of(context).primaryColor,
+            ),
+            child: Text(
+              'Send Connection Request',
+              style: TextStyle(
+                fontSize: 16.sp,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
+            ),
+          ),
+        ),
       ),
     );
   }
