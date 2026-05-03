@@ -59,7 +59,6 @@ class UserProfileView extends ConsumerWidget {
                             child: TextButton.icon(
                               onPressed: () async {
                                 await AuthService.logout();
-                                // Navigation is handled globally in main.dart
                               },
                               icon: Icon(
                                 Icons.logout_rounded,

@@ -120,7 +120,6 @@ class AdminScreen extends ConsumerWidget {
         ),
         body: TabBarView(
           children: [
-            // Reports Tab
             reportsAsync.when(
               data: (reports) {
                 if (reports.isEmpty) {
@@ -141,7 +140,6 @@ class AdminScreen extends ConsumerWidget {
               loading: () => const Center(child: CircularProgressIndicator()),
               error: (e, st) => Center(child: Text('Error: $e')),
             ),
-            // Verifications Tab
             verificationsAsync.when(
               data: (requests) {
                 if (requests.isEmpty) {

@@ -8,7 +8,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../../core/constants/colors.dart';
 import '../../../core/providers/supabase_provider.dart';
-import '../../../shared/widgets/bottom_nav_bar.dart';
 import '../../onboarding/screens/onboarding_screen.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../../core/services/auth_service.dart';
@@ -51,7 +50,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         if (user != null) {
           await AuthService.persistLogin(user.id);
 
-          // Check if user is admin
           final profile = await ref.read(userProfileProvider.future);
           if (mounted) {
             final dest = profile?.isAdmin == true

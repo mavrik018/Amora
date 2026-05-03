@@ -60,7 +60,6 @@ class ProfilePage extends ConsumerWidget {
                           child: Row(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              // Left accent bar
                               Container(
                                 width: 3.w,
                                 height: 44.h,

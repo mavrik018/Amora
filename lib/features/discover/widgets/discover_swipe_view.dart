@@ -66,7 +66,6 @@ class DiscoverSwipeCard extends StatelessWidget {
                 ),
               ),
             ),
-            // Gradient for text readability
             Positioned.fill(
               child: Container(
                 decoration: BoxDecoration(
@@ -79,7 +78,6 @@ class DiscoverSwipeCard extends StatelessWidget {
                 ),
               ),
             ),
-            // Compatibility
             Positioned(
               top: 20.h,
               left: 20.w,

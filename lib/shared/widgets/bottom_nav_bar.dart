@@ -100,7 +100,6 @@ class _ErrorScreen extends StatelessWidget {
               ElevatedButton.icon(
                 onPressed: () async {
                   await AuthService.logout();
-                  // Navigation is handled globally in main.dart
                 },
                 icon: const Icon(Icons.logout_rounded),
                 label: const Text('Force Logout'),

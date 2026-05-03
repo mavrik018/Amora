@@ -92,9 +92,7 @@ class ConnectionRepository {
                   sender: ProfileModel.fromJson(profileRes),
                 ),
               );
-            } catch (e) {
-              print('Error fetching profile for connection request: $e');
-            }
+            } catch (e) {}
           }
           return requests;
         });
@@ -142,9 +140,7 @@ class ConnectionRepository {
                       : null,
                 ),
               );
-            } catch (e) {
-              print('Error fetching profile for accepted connection: $e');
-            }
+            } catch (e) {}
           }
           return populated;
         });

@@ -103,7 +103,6 @@ class _LocationPickerSheetState extends ConsumerState<LocationPickerSheet> {
 
     final repository = ref.read(profileRepositoryProvider);
 
-    // First, save the current location if it exists and is different from the new one
     final savedLocations = List<Map<String, dynamic>>.from(
       profile.savedLocations,
     );
@@ -124,7 +123,6 @@ class _LocationPickerSheetState extends ConsumerState<LocationPickerSheet> {
       }
     }
 
-    // Then, add the new location if not already there
     final newLocExists = savedLocations.any((loc) => loc['name'] == name);
     if (!newLocExists) {
       savedLocations.add({'name': name, 'latitude': lat, 'longitude': lng});

@@ -21,7 +21,6 @@ class SplashScreen extends ConsumerStatefulWidget {
 
 class _SplashScreenState extends ConsumerState<SplashScreen>
     with TickerProviderStateMixin {
-  // ── Controllers ──────────────────────────────────────────────────────────
   late final AnimationController _logoCtrl;
   late final AnimationController _textCtrl;
   late final AnimationController _taglineCtrl;
@@ -29,23 +28,18 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
   late final AnimationController _heartsCtrl;
   late final AnimationController _rippleCtrl;
 
-  // ── Logo animations ───────────────────────────────────────────────────────
   late final Animation<double> _logoScale;
   late final Animation<double> _logoOpacity;
   late final Animation<double> _logoBlur;
 
-  // ── Text animations ───────────────────────────────────────────────────────
   late final Animation<double> _textOpacity;
   late final Animation<Offset> _textSlide;
 
-  // ── Tagline ───────────────────────────────────────────────────────────────
   late final Animation<double> _taglineOpacity;
   late final Animation<Offset> _taglineSlide;
 
-  // ── Progress / shimmer ────────────────────────────────────────────────────
   late final Animation<double> _progressValue;
 
-  // ── Hearts / ripple ───────────────────────────────────────────────────────
   late final Animation<double> _heartsOpacity;
   late final Animation<double> _rippleScale;
   late final Animation<double> _rippleOpacity;
@@ -168,7 +162,6 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
     if (!mounted) return;
     _progressCtrl.forward();
 
-    // Wait for minimum splash + auth check
     await Future.delayed(const Duration(milliseconds: 1600));
     _maybeNavigate();
   }
@@ -243,7 +236,6 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
 
   @override
   Widget build(BuildContext context) {
-    // Listen so navigation fires if auth state arrives after _startSequence
     ref.listen(authStateProvider, (_, next) {
       next.whenData((_) => _maybeNavigate());
     });
@@ -261,7 +253,6 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
         ),
         child: Stack(
           children: [
-            // ── Floating heart particles ──────────────────────────────────
             AnimatedBuilder(
               animation: _heartsCtrl,
               builder: (_, __) {
@@ -275,7 +266,6 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
               },
             ),
 
-            // ── Soft radial glow behind logo ─────────────────────────────
             Center(
               child: Container(
                 width: 260.r,
@@ -292,7 +282,6 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
               ),
             ),
 
-            // ── Ripple ring ──────────────────────────────────────────────
             Center(
               child: AnimatedBuilder(
                 animation: _rippleCtrl,
@@ -316,12 +305,10 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
               ),
             ),
 
-            // ── Main content ─────────────────────────────────────────────
             Center(
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  // Logo icon
                   AnimatedBuilder(
                     animation: _logoCtrl,
                     builder: (_, __) => Transform.scale(
@@ -335,7 +322,6 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
 
                   SizedBox(height: 28.h),
 
-                  // App name
                   SlideTransition(
                     position: _textSlide,
                     child: FadeTransition(
@@ -354,7 +340,6 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
 
                   SizedBox(height: 10.h),
 
-                  // Tagline
                   SlideTransition(
                     position: _taglineSlide,
                     child: FadeTransition(
@@ -374,7 +359,6 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
               ),
             ),
 
-            // ── Progress bar at bottom ────────────────────────────────────
             Positioned(
               bottom: 60.h,
               left: 0,
@@ -411,9 +395,6 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
   }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Logo icon widget
-// ─────────────────────────────────────────────────────────────────────────────
 class _LogoIcon extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -443,9 +424,6 @@ class _LogoIcon extends StatelessWidget {
   }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Shimmer progress bar
-// ─────────────────────────────────────────────────────────────────────────────
 class _ShimmerProgressBar extends StatefulWidget {
   final double value;
   const _ShimmerProgressBar({required this.value});
@@ -491,9 +469,7 @@ class _ShimmerProgressBarState extends State<_ShimmerProgressBar>
             builder: (_, __) {
               return Stack(
                 children: [
-                  // Track
                   Container(color: AppColors.primary.withOpacity(0.15)),
-                  // Fill
                   FractionallySizedBox(
                     widthFactor: widget.value,
                     child: Container(
@@ -523,9 +499,6 @@ class _ShimmerProgressBarState extends State<_ShimmerProgressBar>
   }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Floating heart particles
-// ─────────────────────────────────────────────────────────────────────────────
 class _HeartParticle {
   final double x;
   final double y;
@@ -553,9 +526,8 @@ class _HeartsLayer extends StatelessWidget {
     final size = MediaQuery.of(context).size;
     return Stack(
       children: particles.map((p) {
-        // Each heart drifts upward and oscillates horizontally
         final t = (progress * p.speed + p.phase) % 1.0;
-        final dy = 1.0 - t; // 1 → 0 (bottom to top)
+        final dy = 1.0 - t;
         final dx = p.x + 0.04 * sin(t * 4 * pi + p.phase);
 
         return Positioned(

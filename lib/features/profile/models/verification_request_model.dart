@@ -6,7 +6,7 @@ class VerificationRequestModel {
   final String? rejectionReason;
   final DateTime createdAt;
   final DateTime updatedAt;
-  final String? userFullName; // For admin view
+  final String? userFullName;
 
   VerificationRequestModel({
     required this.id,

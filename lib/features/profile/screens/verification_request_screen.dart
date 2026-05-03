@@ -44,13 +44,11 @@ class _VerificationRequestScreenState
       final profile = await ref.read(userProfileProvider.future);
       if (profile == null) return;
 
-      // 1. Upload to storage
       final imageUrl = await repository.uploadVerificationId(
         profile.id,
         _selectedImage!,
       );
 
-      // 2. Submit request
       await repository.submitVerificationRequest(profile.id, imageUrl);
 
       if (mounted) {
@@ -62,9 +60,9 @@ class _VerificationRequestScreenState
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: $e')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Error: $e')));
       }
     } finally {
       if (mounted) {
@@ -134,7 +132,8 @@ class _VerificationRequestScreenState
                 fontWeight: FontWeight.bold,
               ),
             ),
-            if (request.status == 'rejected' && request.rejectionReason != null) ...[
+            if (request.status == 'rejected' &&
+                request.rejectionReason != null) ...[
               SizedBox(height: 12.h),
               Text(
                 'Reason: ${request.rejectionReason}',
@@ -198,10 +197,7 @@ class _VerificationRequestScreenState
               child: _selectedImage != null
                   ? ClipRRect(
                       borderRadius: BorderRadius.circular(16.r),
-                      child: Image.file(
-                        _selectedImage!,
-                        fit: BoxFit.cover,
-                      ),
+                      child: Image.file(_selectedImage!, fit: BoxFit.cover),
                     )
                   : Column(
                       mainAxisAlignment: MainAxisAlignment.center,

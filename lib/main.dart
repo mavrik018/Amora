@@ -54,7 +54,7 @@ class MyApp extends ConsumerWidget {
       minTextAdapt: true,
       builder: (context, child) {
         return MaterialApp(
-          navigatorKey: navigatorKey, // wire the global key
+          navigatorKey: navigatorKey,
           debugShowCheckedModeBanner: false,
           theme: AppTheme.lightTheme,
           home: const SplashScreen(),

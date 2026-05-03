@@ -7,17 +7,6 @@ class ProfileHeaderInfo extends StatelessWidget {
   final ProfileModel profile;
   const ProfileHeaderInfo({super.key, required this.profile});
 
-  int _calculateAge(DateTime? dob) {
-    if (dob == null) return 0;
-    final now = DateTime.now();
-    int age = now.year - dob.year;
-    if (now.month < dob.month ||
-        (now.month == dob.month && now.day < dob.day)) {
-      age--;
-    }
-    return age;
-  }
-
   String _getIntentLabel(RelationshipIntent? intent) {
     switch (intent) {
       case RelationshipIntent.serious:
@@ -34,7 +23,6 @@ class ProfileHeaderInfo extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final age = _calculateAge(profile.dob);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,

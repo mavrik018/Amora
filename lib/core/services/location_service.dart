@@ -51,7 +51,6 @@ class LocationService {
         return "${place.name}, ${place.subLocality}, ${place.locality}";
       }
     } catch (e) {
-      print(e);
     }
     return null;
   }

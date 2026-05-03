@@ -37,7 +37,6 @@ final otherProfilesProvider = FutureProvider<List<ProfileModel>>((ref) async {
         verifiedOnly: filters.verifiedOnly,
       );
     } catch (e) {
-      print('Discovery: RPC error, falling back: $e');
       final allProfiles = await service.getProfiles();
       profiles = _applyClientFilters(allProfiles, filters, userProfile);
     }
@@ -108,19 +107,16 @@ List<ProfileModel> _applyClientFilters(
 ) {
   List<ProfileModel> filtered = profiles;
 
-  // Gender Filter
   if (filters.gender != "Non-binary") {
     filtered = filtered.where((p) => p.gender == filters.gender).toList();
   }
 
-  // Age Filter
   filtered = filtered.where((p) {
     if (p.dob == null) return false;
     final age = _calculateAge(p.dob!);
     return age >= filters.minAge && age <= filters.maxAge;
   }).toList();
 
-  // Distance Filter
   if (userProfile != null &&
       userProfile.latitude != null &&
       userProfile.longitude != null) {
@@ -136,7 +132,6 @@ List<ProfileModel> _applyClientFilters(
     }).toList();
   }
 
-  // Verified Only Filter
   if (filters.verifiedOnly) {
     filtered = filtered.where((p) => p.isVerified).toList();
   }

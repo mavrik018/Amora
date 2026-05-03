@@ -58,7 +58,6 @@ class DiscoverGridCard extends StatelessWidget {
                 ),
               ),
             ),
-            // Gradient for text readability
             Positioned.fill(
               child: Container(
                 decoration: BoxDecoration(
