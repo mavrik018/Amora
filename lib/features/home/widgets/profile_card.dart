@@ -1,4 +1,5 @@
 import 'package:amora/core/constants/colors.dart';
+import 'package:amora/core/widgets/custom_snackbar.dart';
 import 'package:amora/features/discover/providers/profiles.dart';
 import 'package:amora/features/profile/providers/block_provider.dart';
 import 'package:flutter/material.dart';
@@ -149,10 +150,13 @@ class ProfileCard extends ConsumerWidget {
                               borderRadius: BorderRadius.circular(16.r),
                             ),
                             child: Text(
-                              'Feeling social',
+                              profile.statusToday ?? 'Feeling social',
                               style: TextStyle(
                                 color: Colors.white,
                                 fontSize: 12.sp,
+                                fontWeight: profile.statusToday != null
+                                    ? FontWeight.bold
+                                    : FontWeight.normal,
                               ),
                             ),
                           ),
@@ -260,8 +264,10 @@ class ProfileCard extends ConsumerWidget {
               await ref.read(blockRepositoryProvider).blockUser(profile.id);
               if (context.mounted) {
                 ref.invalidate(otherProfilesProvider);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('${profile.fullName} hidden')),
+                CustomSnackBar.show(
+                  context,
+                  message: '${profile.fullName} hidden',
+                  type: SnackBarType.info,
                 );
               }
             },

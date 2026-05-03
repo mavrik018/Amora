@@ -1,4 +1,5 @@
 import 'package:amora/shared/widgets/bottom_nav_bar.dart';
+import 'package:amora/core/widgets/custom_snackbar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -189,15 +190,10 @@ class OnboardingScreen extends HookConsumerWidget {
                         }
 
                         if (validationError != null) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text(validationError),
-                              backgroundColor: theme.colorScheme.error,
-                              behavior: SnackBarBehavior.floating,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12.r),
-                              ),
-                            ),
+                          CustomSnackBar.show(
+                            context,
+                            message: validationError,
+                            type: SnackBarType.error,
                           );
                           return;
                         }
@@ -206,17 +202,11 @@ class OnboardingScreen extends HookConsumerWidget {
                           notifier.nextStep();
                         } else {
                           if (latestState.photos.isEmpty) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: const Text(
+                            CustomSnackBar.show(
+                              context,
+                              message:
                                   'Please upload at least 1 profile photo.',
-                                ),
-                                backgroundColor: theme.colorScheme.error,
-                                behavior: SnackBarBehavior.floating,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(12.r),
-                                ),
-                              ),
+                              type: SnackBarType.error,
                             );
                             return;
                           }

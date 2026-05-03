@@ -1,12 +1,14 @@
+import 'package:amora/core/providers/supabase_provider.dart';
 import 'package:amora/core/theme/app_theme.dart';
-import 'package:amora/features/onboarding/screens/get_started_screen.dart';
-import 'package:amora/shared/widgets/bottom_nav_bar.dart';
+import 'package:amora/features/auth/screens/login_screen.dart';
+import 'package:amora/features/splash/screens/splash_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:amora/core/services/auth_service.dart';
+
+final navigatorKey = GlobalKey<NavigatorState>();
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -18,29 +20,46 @@ void main() async {
     anonKey: dotenv.env['SUPABASE_ANON_KEY'] ?? '',
   );
 
-  final bool isLoggedIn = await AuthService.isLoggedIn();
-
-  runApp(
-    ProviderScope(
-      child: ScreenUtilInit(
-        designSize: const Size(411.0, 914.0),
-        minTextAdapt: true,
-        builder: (context, child) => MyApp(isLoggedIn: isLoggedIn),
-      ),
-    ),
-  );
+  runApp(const ProviderScope(child: MyApp()));
 }
 
-class MyApp extends StatelessWidget {
-  final bool isLoggedIn;
-  const MyApp({super.key, required this.isLoggedIn});
+class MyApp extends ConsumerWidget {
+  const MyApp({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      theme: AppTheme.lightTheme,
-      home: isLoggedIn ? const BottomNavBar() : const GetStartedScreen(),
+  Widget build(BuildContext context, WidgetRef ref) {
+    ref.listen(authStateProvider, (_, next) {
+      next.whenData((event) {
+        if (event.event == AuthChangeEvent.signedOut) {
+          navigatorKey.currentState?.pushAndRemoveUntil(
+            PageRouteBuilder(
+              pageBuilder: (_, __, ___) => const LoginScreen(),
+              transitionDuration: const Duration(milliseconds: 400),
+              transitionsBuilder: (_, animation, __, child) => FadeTransition(
+                opacity: CurvedAnimation(
+                  parent: animation,
+                  curve: Curves.easeIn,
+                ),
+                child: child,
+              ),
+            ),
+            (route) => false,
+          );
+        }
+      });
+    });
+
+    return ScreenUtilInit(
+      designSize: const Size(411.0, 914.0),
+      minTextAdapt: true,
+      builder: (context, child) {
+        return MaterialApp(
+          navigatorKey: navigatorKey, // wire the global key
+          debugShowCheckedModeBanner: false,
+          theme: AppTheme.lightTheme,
+          home: const SplashScreen(),
+        );
+      },
     );
   }
 }

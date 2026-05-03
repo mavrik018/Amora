@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:amora/core/widgets/custom_snackbar.dart';
 import 'package:path/path.dart' as path;
 import '../models/profile_model.dart';
 import '../providers/profile_provider.dart';
@@ -70,9 +71,11 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
 
   Future<void> _saveProfile() async {
     if (_nameController.text.trim().isEmpty) {
-      ScaffoldMessenger.of(
+      CustomSnackBar.show(
         context,
-      ).showSnackBar(const SnackBar(content: Text('Please enter your name')));
+        message: 'Please enter your name',
+        type: SnackBarType.error,
+      );
       return;
     }
 
@@ -107,12 +110,10 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
         if (fileSizeInMB > 3.0) {
           setState(() => _isLoading = false);
           if (mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('Audio too long'),
-                backgroundColor: Colors.red,
-                behavior: SnackBarBehavior.floating,
-              ),
+            CustomSnackBar.show(
+              context,
+              message: 'Audio too long',
+              type: SnackBarType.error,
             );
           }
           return;
@@ -172,20 +173,18 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
 
       if (mounted) {
         Navigator.of(context).pop();
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Profile updated successfully!'),
-            behavior: SnackBarBehavior.floating,
-          ),
+        CustomSnackBar.show(
+          context,
+          message: 'Profile updated successfully!',
+          type: SnackBarType.success,
         );
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Error: $e'),
-            backgroundColor: Theme.of(context).colorScheme.error,
-          ),
+        CustomSnackBar.show(
+          context,
+          message: 'Error: $e',
+          type: SnackBarType.error,
         );
       }
     } finally {

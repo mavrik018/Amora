@@ -1,5 +1,8 @@
 import 'package:amora/core/widgets/text_field.dart';
 import 'package:amora/core/widgets/social_button.dart';
+import 'package:amora/features/profile/providers/profile_provider.dart';
+import 'package:amora/features/profile/screens/admin_screen.dart';
+import 'package:amora/shared/widgets/bottom_nav_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -8,7 +11,6 @@ import '../../../core/providers/supabase_provider.dart';
 import '../../../shared/widgets/bottom_nav_bar.dart';
 import '../../onboarding/screens/onboarding_screen.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import '../../../core/services/auth_service.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
@@ -48,12 +50,20 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         final user = supabase.auth.currentUser;
         if (user != null) {
           await AuthService.persistLogin(user.id);
-        }
 
-        Navigator.of(context).pushAndRemoveUntil(
-          MaterialPageRoute(builder: (context) => const BottomNavBar()),
-          (route) => false,
-        );
+          // Check if user is admin
+          final profile = await ref.read(userProfileProvider.future);
+          if (mounted) {
+            final dest = profile?.isAdmin == true
+                ? const AdminScreen()
+                : const BottomNavBar();
+
+            Navigator.of(context).pushAndRemoveUntil(
+              MaterialPageRoute(builder: (context) => dest),
+              (route) => false,
+            );
+          }
+        }
       }
     } on AuthException catch (e) {
       setState(() {

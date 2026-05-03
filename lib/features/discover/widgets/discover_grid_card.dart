@@ -140,6 +140,21 @@ class DiscoverGridCard extends StatelessWidget {
                       fontSize: 12.sp,
                     ),
                   ),
+                  if (profile.statusToday != null &&
+                      profile.statusToday!.isNotEmpty) ...[
+                    SizedBox(height: 6.h),
+                    Text(
+                      '"${profile.statusToday}"',
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: Colors.white,
+                        fontStyle: FontStyle.italic,
+                        fontSize: 10.sp,
+                        fontWeight: FontWeight.w600,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
                 ],
               ),
             ),

@@ -14,9 +14,16 @@ final blockedUserIdsProvider = StreamProvider<Set<String>>((ref) {
   return Supabase.instance.client
       .from('user_blocks')
       .stream(primaryKey: ['id'])
-      .eq('user_id', myId)
       .map((data) {
-        return data.map((row) => row['blocked_id'] as String).toSet();
+        final Set<String> ids = {};
+        for (var row in data) {
+          if (row['user_id'] == myId) {
+            ids.add(row['blocked_id'] as String);
+          } else if (row['blocked_id'] == myId) {
+            ids.add(row['user_id'] as String);
+          }
+        }
+        return ids;
       });
 });
 
@@ -48,10 +55,7 @@ class BlockRepository {
       final fileName = '${DateTime.now().millisecondsSinceEpoch}.jpg';
       final path = 'report_evidence/$myId/$fileName';
 
-      await _supabase.storage.from('reports').upload(
-            path,
-            evidenceImage,
-          );
+      await _supabase.storage.from('reports').upload(path, evidenceImage);
 
       evidenceUrl = _supabase.storage.from('reports').getPublicUrl(path);
     }

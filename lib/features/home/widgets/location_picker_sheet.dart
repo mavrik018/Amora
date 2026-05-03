@@ -253,7 +253,7 @@ class _LocationPickerSheetState extends ConsumerState<LocationPickerSheet> {
                       ),
                     ),
                     title: Text(
-                      loc['name'] ?? 'Unknown',
+                      loc['name'] ?? '',
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                         fontWeight: isCurrent ? FontWeight.bold : null,
                         color: isCurrent ? AppColors.primary : null,

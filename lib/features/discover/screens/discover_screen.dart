@@ -68,7 +68,7 @@ class DiscoverScreen extends ConsumerWidget {
                           return DiscoverGridCard(
                             index: index,
                             age: profile.age ?? 0,
-                            location: profile.locationName ?? 'Unknown',
+                            location: profile.locationName ?? '',
                             name: profile.fullName,
                             imageUrl: profile.photos.isNotEmpty
                                 ? profile.photos[0]
@@ -91,7 +91,7 @@ class DiscoverScreen extends ConsumerWidget {
                               index: index,
                               name: profile.fullName,
                               age: profile.age ?? 0,
-                              location: profile.locationName ?? 'Unknown',
+                              location: profile.locationName ?? '',
                               imageUrl: profile.photos.isNotEmpty
                                   ? profile.photos[0]
                                   : '',

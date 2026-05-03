@@ -10,6 +10,8 @@ import '../widgets/profile_header_info.dart';
 import '../widgets/profile_audio_bio.dart';
 import '../widgets/profile_prompt_cards.dart';
 import '../widgets/profile_interests_section.dart';
+import 'admin_screen.dart';
+import '../providers/admin_provider.dart';
 
 class UserProfileView extends ConsumerWidget {
   const UserProfileView({super.key});
@@ -41,6 +43,7 @@ class UserProfileView extends ConsumerWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           ProfileHeaderInfo(profile: profile),
+
                           SizedBox(height: 24.h),
                           ProfileAudioBio(audioBioUrl: profile.audioBioUrl),
                           SizedBox(height: 24.h),
@@ -52,14 +55,7 @@ class UserProfileView extends ConsumerWidget {
                             child: TextButton.icon(
                               onPressed: () async {
                                 await AuthService.logout();
-                                if (context.mounted) {
-                                  Navigator.of(context).pushAndRemoveUntil(
-                                    MaterialPageRoute(
-                                      builder: (context) => const LoginScreen(),
-                                    ),
-                                    (route) => false,
-                                  );
-                                }
+                                // Navigation is handled globally in main.dart
                               },
                               icon: Icon(
                                 Icons.logout_rounded,

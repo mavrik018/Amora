@@ -8,6 +8,7 @@ import 'package:amora/features/chat/providers/connection_provider.dart';
 import 'package:amora/features/discover/providers/profiles.dart';
 import 'dart:io';
 import 'package:amora/features/profile/providers/block_provider.dart';
+import 'package:amora/core/widgets/custom_snackbar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -35,6 +36,89 @@ class ProfilePage extends ConsumerWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       ProfileHeaderInfo(profile: profile),
+                      if (profile.statusToday != null &&
+                          profile.statusToday!.isNotEmpty) ...[
+                        SizedBox(height: 16.h),
+                        Container(
+                          width: double.infinity,
+                          padding: EdgeInsets.symmetric(
+                            horizontal: 16.w,
+                            vertical: 14.h,
+                          ),
+                          decoration: BoxDecoration(
+                            color: Theme.of(
+                              context,
+                            ).colorScheme.surfaceContainerLowest,
+                            borderRadius: BorderRadius.circular(20.r),
+                            border: Border.all(
+                              color: Theme.of(
+                                context,
+                              ).colorScheme.outlineVariant.withOpacity(0.6),
+                              width: 1,
+                            ),
+                          ),
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              // Left accent bar
+                              Container(
+                                width: 3.w,
+                                height: 44.h,
+                                decoration: BoxDecoration(
+                                  color: Theme.of(context).colorScheme.primary,
+                                  borderRadius: BorderRadius.circular(4.r),
+                                ),
+                              ),
+                              SizedBox(width: 12.w),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Row(
+                                      children: [
+                                        Icon(
+                                          Icons.circle,
+                                          size: 7.r,
+                                          color: Colors.green.shade500,
+                                        ),
+                                        SizedBox(width: 5.w),
+                                        Text(
+                                          'Status today',
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .labelSmall
+                                              ?.copyWith(
+                                                color: Theme.of(
+                                                  context,
+                                                ).colorScheme.onSurfaceVariant,
+                                                fontWeight: FontWeight.w600,
+                                                letterSpacing: 0.5,
+                                              ),
+                                        ),
+                                      ],
+                                    ),
+                                    SizedBox(height: 5.h),
+                                    Text(
+                                      '"${profile.statusToday}"',
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .bodyMedium
+                                          ?.copyWith(
+                                            fontStyle: FontStyle.italic,
+                                            fontWeight: FontWeight.w500,
+                                            color: Theme.of(
+                                              context,
+                                            ).colorScheme.onSurface,
+                                            height: 1.4,
+                                          ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
                       SizedBox(height: 24.h),
                       ProfileAudioBio(audioBioUrl: profile.audioBioUrl),
                       SizedBox(height: 24.h),
@@ -148,22 +232,18 @@ class ProfilePage extends ConsumerWidget {
                                     );
                                     ref.invalidate(otherProfilesProvider);
 
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(
-                                        content: Text(
-                                          'Connection request sent!',
-                                        ),
-                                      ),
+                                    CustomSnackBar.show(
+                                      context,
+                                      message: 'Connection request sent!',
+                                      type: SnackBarType.success,
                                     );
                                   }
                                 } catch (e) {
                                   if (context.mounted) {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(
-                                        content: Text(
-                                          'Failed to send request: $e',
-                                        ),
-                                      ),
+                                    CustomSnackBar.show(
+                                      context,
+                                      message: 'Failed to send request: $e',
+                                      type: SnackBarType.error,
                                     );
                                   }
                                 } finally {
@@ -242,8 +322,10 @@ class ProfilePage extends ConsumerWidget {
                 ref.invalidate(otherProfilesProvider);
                 Navigator.pop(context);
                 Navigator.pop(context);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('${profile.fullName} hidden')),
+                CustomSnackBar.show(
+                  context,
+                  message: '${profile.fullName} hidden',
+                  type: SnackBarType.info,
                 );
               }
             },
@@ -365,10 +447,10 @@ class ProfilePage extends ConsumerWidget {
                     ? null
                     : () async {
                         if (reasonController.text.isEmpty) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text('Please provide a reason'),
-                            ),
+                          CustomSnackBar.show(
+                            context,
+                            message: 'Please provide a reason',
+                            type: SnackBarType.error,
                           );
                           return;
                         }
@@ -389,19 +471,19 @@ class ProfilePage extends ConsumerWidget {
                             ref.invalidate(otherProfilesProvider);
                             Navigator.pop(context);
                             Navigator.pop(context);
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text(
-                                  'Report submitted. Profile hidden.',
-                                ),
-                              ),
+                            CustomSnackBar.show(
+                              context,
+                              message: 'Report submitted. Profile hidden.',
+                              type: SnackBarType.success,
                             );
                           }
                         } catch (e) {
                           if (context.mounted) {
                             setDialogState(() => isSubmitting = false);
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text('Error: $e')),
+                            CustomSnackBar.show(
+                              context,
+                              message: 'Error: $e',
+                              type: SnackBarType.error,
                             );
                           }
                         }

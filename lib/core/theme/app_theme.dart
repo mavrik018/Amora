@@ -71,6 +71,20 @@ class AppTheme {
         ),
         contentPadding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 18.h),
       ),
+
+      snackBarTheme: SnackBarThemeData(
+        behavior: SnackBarBehavior.floating,
+        backgroundColor: Colors.white,
+        elevation: 8,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20.r),
+        ),
+        contentTextStyle: GoogleFonts.plusJakartaSans(
+          fontSize: 14.sp,
+          color: AppColors.textPrimary,
+          fontWeight: FontWeight.w600,
+        ),
+      ),
     );
   }
 }

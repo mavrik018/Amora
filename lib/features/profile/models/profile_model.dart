@@ -16,6 +16,9 @@ class ProfileModel {
   final String? locationName;
   final List<Map<String, dynamic>> savedLocations;
   final int? compatibilityScore;
+  final String? statusToday;
+  final bool isBanned;
+  final bool isAdmin;
 
   int? get age {
     if (dob == null) return null;
@@ -44,6 +47,9 @@ class ProfileModel {
     this.locationName,
     this.savedLocations = const [],
     this.compatibilityScore,
+    this.statusToday,
+    this.isBanned = false,
+    this.isAdmin = false,
   });
 
   ProfileModel copyWith({
@@ -62,6 +68,9 @@ class ProfileModel {
     String? locationName,
     List<Map<String, dynamic>>? savedLocations,
     int? compatibilityScore,
+    String? statusToday,
+    bool? isBanned,
+    bool? isAdmin,
   }) {
     return ProfileModel(
       id: id ?? this.id,
@@ -79,6 +88,9 @@ class ProfileModel {
       locationName: locationName ?? this.locationName,
       savedLocations: savedLocations ?? this.savedLocations,
       compatibilityScore: compatibilityScore ?? this.compatibilityScore,
+      statusToday: statusToday ?? this.statusToday,
+      isBanned: isBanned ?? this.isBanned,
+      isAdmin: isAdmin ?? this.isAdmin,
     );
   }
 
@@ -96,7 +108,9 @@ class ProfileModel {
       'audio_bio_url': audioBioUrl,
       'location_name': locationName,
       'saved_locations': savedLocations,
-      'compatibility_score': compatibilityScore,
+      'status_today': statusToday,
+      'is_banned': isBanned,
+      'is_admin': isAdmin,
     };
 
     if (latitude != null && longitude != null) {
@@ -130,7 +144,9 @@ class ProfileModel {
       savedLocations: List<Map<String, dynamic>>.from(
         json['saved_locations'] ?? [],
       ),
-      compatibilityScore: json['compatibility_score'],
+      statusToday: json['status_today'],
+      isBanned: json['is_banned'] ?? false,
+      isAdmin: json['is_admin'] ?? false,
     );
   }
 }

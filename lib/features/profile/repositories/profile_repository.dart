@@ -26,4 +26,11 @@ class ProfileRepository {
         .update(profile.toJson())
         .eq('id', profile.id);
   }
+
+  Future<void> updateStatus(String id, String status) async {
+    await _client
+        .from('profiles')
+        .update({'status_today': status})
+        .eq('id', id);
+  }
 }

@@ -348,7 +348,7 @@ class ChatListScreen extends ConsumerWidget {
                                         CrossAxisAlignment.start,
                                     children: [
                                       Text(
-                                        otherProfile?.fullName ?? 'Unknown',
+                                        otherProfile?.fullName ?? '',
                                         style: TextStyle(
                                           fontSize: 15.sp,
                                           fontWeight: FontWeight.w600,
