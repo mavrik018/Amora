@@ -3,6 +3,8 @@ import 'package:amora/core/services/supabase_service.dart';
 import 'package:amora/features/discover/providers/filters_provider.dart';
 import 'package:amora/features/profile/models/profile_model.dart';
 import 'package:amora/features/profile/providers/profile_provider.dart';
+import 'package:amora/features/chat/providers/connection_provider.dart';
+import 'package:amora/features/profile/providers/block_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geolocator/geolocator.dart';
 
@@ -16,9 +18,11 @@ final otherProfilesProvider = FutureProvider<List<ProfileModel>>((ref) async {
   final userProfileAsync = ref.watch(userProfileProvider);
   final userProfile = userProfileAsync.value;
 
+  final connectedIds = await ref.watch(connectedUserIdsProvider.future);
+  final blockedIds = await ref.watch(blockedUserIdsProvider.future);
+
   List<ProfileModel> profiles = [];
 
-  // 1. Fetch Profiles (via RPC or Table Select)
   if (userProfile != null &&
       userProfile.latitude != null &&
       userProfile.longitude != null) {
@@ -41,42 +45,52 @@ final otherProfilesProvider = FutureProvider<List<ProfileModel>>((ref) async {
     profiles = _applyClientFilters(allProfiles, filters, userProfile);
   }
 
-  // 2. Complete Client-Side Compatibility Scoring
+  if (connectedIds.isNotEmpty || blockedIds.isNotEmpty) {
+    profiles = profiles.where((p) {
+      final isConnected = connectedIds.contains(p.id);
+      final isBlocked = blockedIds.contains(p.id);
+      return !isConnected && !isBlocked;
+    }).toList();
+  }
+
   if (userProfile != null) {
     profiles = profiles.map((p) {
       int score = 0;
 
-      // A. Shared Interests (50%) - More lenient: even 1 match is a big boost
       if (userProfile.interests.isNotEmpty) {
         final sharedCount = p.interests
             .where((i) => userProfile.interests.contains(i))
             .length;
 
         if (sharedCount > 0) {
-          // Give 25 points for the first match, and +10 for each additional one
           score += (15 + (sharedCount * 10)).clamp(0, 50);
         }
       }
 
-      // B. Relationship Intent (30%) - Higher base for mismatches
       if (p.relationshipIntent == userProfile.relationshipIntent) {
         score += 30;
       } else if (p.relationshipIntent == RelationshipIntent.openToBoth ||
           userProfile.relationshipIntent == RelationshipIntent.openToBoth) {
         score += 25;
       } else {
-        score += 20; // Increased floor for intent mismatch
+        score += 20;
       }
 
-      // C. Personality Prompt Completion (20%)
-      if (p.prompts.isNotEmpty) {
-        score += 20;
+      if (p.prompts.length == userProfile.prompts.length) {
+        score += 10;
+      } else if (p.prompts.length > userProfile.prompts.length) {
+        score += 5;
+      } else {
+        score += 0;
+      }
+
+      if (p.audioBioUrl != null) {
+        score += 15;
       }
 
       return p.copyWith(compatibilityScore: score);
     }).toList();
 
-    // 3. Sort by Compatibility Score (Descending)
     profiles.sort(
       (a, b) =>
           (b.compatibilityScore ?? 0).compareTo(a.compatibilityScore ?? 0),
@@ -86,7 +100,6 @@ final otherProfilesProvider = FutureProvider<List<ProfileModel>>((ref) async {
   return profiles;
 });
 
-/// Helper to apply filters when RPC is not available or location is missing
 List<ProfileModel> _applyClientFilters(
   List<ProfileModel> profiles,
   DiscoveryFilters filters,

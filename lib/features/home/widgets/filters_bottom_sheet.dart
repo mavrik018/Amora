@@ -4,16 +4,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-class FiltersBottomSheet extends ConsumerStatefulWidget {
+class FiltersBottomSheet extends ConsumerWidget {
   const FiltersBottomSheet({super.key});
 
   @override
-  ConsumerState<FiltersBottomSheet> createState() => _FiltersBottomSheetState();
-}
-
-class _FiltersBottomSheetState extends ConsumerState<FiltersBottomSheet> {
-  @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final filters = ref.watch(discoveryFiltersProvider);
     final filterNotifier = ref.read(discoveryFiltersProvider.notifier);
 
@@ -30,7 +25,6 @@ class _FiltersBottomSheetState extends ConsumerState<FiltersBottomSheet> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Drag handle
               Center(
                 child: Container(
                   width: 40.w,
@@ -43,7 +37,6 @@ class _FiltersBottomSheetState extends ConsumerState<FiltersBottomSheet> {
               ),
               SizedBox(height: 24.h),
 
-              // Header
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -74,7 +67,6 @@ class _FiltersBottomSheetState extends ConsumerState<FiltersBottomSheet> {
               ),
               SizedBox(height: 32.h),
 
-              // Age Range
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -131,7 +123,6 @@ class _FiltersBottomSheetState extends ConsumerState<FiltersBottomSheet> {
               ),
               SizedBox(height: 24.h),
 
-              // Distance
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -178,7 +169,6 @@ class _FiltersBottomSheetState extends ConsumerState<FiltersBottomSheet> {
               ),
               SizedBox(height: 24.h),
 
-              // Show Me
               Text(
                 'Show Me',
                 style: TextStyle(
@@ -206,7 +196,6 @@ class _FiltersBottomSheetState extends ConsumerState<FiltersBottomSheet> {
               ),
               SizedBox(height: 32.h),
 
-              // Verified Only
               Container(
                 padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
                 decoration: BoxDecoration(

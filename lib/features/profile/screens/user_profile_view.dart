@@ -48,7 +48,6 @@ class UserProfileView extends ConsumerWidget {
                           SizedBox(height: 24.h),
                           ProfileInterestsSection(interests: profile.interests),
                           SizedBox(height: 40.h),
-                          // Logout Button
                           Center(
                             child: TextButton.icon(
                               onPressed: () async {

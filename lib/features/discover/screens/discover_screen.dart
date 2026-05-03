@@ -1,5 +1,4 @@
 import 'package:amora/features/discover/providers/profiles.dart';
-import 'package:amora/features/profile/models/profile_model.dart';
 import 'package:amora/features/discover/widgets/active_filters_list.dart';
 import 'package:amora/features/discover/widgets/discover_grid_card.dart';
 import 'package:amora/features/discover/widgets/discover_swipe_view.dart';
@@ -7,22 +6,20 @@ import 'package:amora/features/discover/widgets/mode_toggle.dart';
 import 'package:amora/features/home/widgets/home_header.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/legacy.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-class DiscoverScreen extends ConsumerStatefulWidget {
+final discoverModeProvider = StateProvider<bool>((ref) => true);
+
+class DiscoverScreen extends ConsumerWidget {
   const DiscoverScreen({super.key});
 
   @override
-  ConsumerState<DiscoverScreen> createState() => _DiscoverScreenState();
-}
-
-class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
-  bool isGridMode = true;
-
-  @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final profileProvider = ref.watch(otherProfilesProvider);
+    final isGridMode = ref.watch(discoverModeProvider);
+
     return SafeArea(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -37,9 +34,7 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
                 ModeToggle(
                   isGridMode: isGridMode,
                   onModeChanged: (value) {
-                    setState(() {
-                      isGridMode = value;
-                    });
+                    ref.read(discoverModeProvider.notifier).state = value;
                   },
                 ),
               ],

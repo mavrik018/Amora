@@ -63,7 +63,6 @@ class _ProfileImageGalleryState extends State<ProfileImageGallery> {
               );
             },
           ),
-          // Dot indicators
           Positioned(
             bottom: 16.h,
             left: 0,

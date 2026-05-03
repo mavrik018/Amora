@@ -30,7 +30,6 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
   bool _isLoading = false;
   final ImagePicker _picker = ImagePicker();
 
-  // Audio recording state
   String? _localAudioPath;
 
   @override
@@ -82,7 +81,6 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
       final supabase = ref.read(supabaseClientProvider);
       final List<String> uploadedUrls = [];
 
-      // Upload photos
       for (String photoPath in _photos) {
         if (photoPath.startsWith('http')) {
           uploadedUrls.add(photoPath);
@@ -99,12 +97,10 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
         }
       }
 
-      // Upload audio bio if new
       String? finalAudioUrl = _audioBioUrl;
       if (_localAudioPath != null) {
         final file = File(_localAudioPath!);
 
-        // Check file size (3MB limit)
         final int fileSizeInBytes = await file.length();
         final double fileSizeInMB = fileSizeInBytes / (1024 * 1024);
 
@@ -131,20 +127,17 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
             .getPublicUrl(fileName);
       }
 
-      // Identify photos that were removed to delete them from storage
       final originalUrls = widget.profile.photos;
       final remainingUrls = _photos.where((p) => p.startsWith('http')).toList();
       final urlsToDelete = originalUrls
           .where((url) => !remainingUrls.contains(url))
           .toList();
 
-      // Handle Audio Bio cleanup
       if (widget.profile.audioBioUrl != null &&
           widget.profile.audioBioUrl != finalAudioUrl) {
         urlsToDelete.add(widget.profile.audioBioUrl!);
       }
 
-      // Delete removed files from Supabase Storage
       for (String url in urlsToDelete) {
         try {
           final uri = Uri.parse(url);
@@ -319,15 +312,6 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
             ),
             SizedBox(height: 32.h),
 
-            // Audio Bio Section
-            Text(
-              'Audio Bio',
-              style: theme.textTheme.labelLarge?.copyWith(
-                fontWeight: FontWeight.bold,
-                color: Colors.grey.shade700,
-              ),
-            ),
-            SizedBox(height: 16.h),
             AudioBioEditor(
               initialAudioUrl: _audioBioUrl,
               initialLocalPath: _localAudioPath,

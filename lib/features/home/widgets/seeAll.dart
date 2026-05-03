@@ -4,7 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class SeeAllButton extends ConsumerWidget {
-  final int tabIndex; // which tab to navigate to
+  final int tabIndex;
 
   const SeeAllButton({super.key, required this.tabIndex});
 

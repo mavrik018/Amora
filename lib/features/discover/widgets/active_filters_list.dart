@@ -16,7 +16,6 @@ class ActiveFiltersList extends ConsumerWidget {
 
     final List<Widget> chips = [];
 
-    // Age chip (only if not default 18-65)
     if (filters.minAge != 18 || filters.maxAge != 65) {
       if (chips.isNotEmpty) chips.add(SizedBox(width: 8.w));
       chips.add(
@@ -30,7 +29,6 @@ class ActiveFiltersList extends ConsumerWidget {
       );
     }
 
-    // Verified chip
     if (filters.verifiedOnly) {
       if (chips.isNotEmpty) chips.add(SizedBox(width: 8.w));
       chips.add(
@@ -44,7 +42,6 @@ class ActiveFiltersList extends ConsumerWidget {
       );
     }
 
-    // Distance/Location chip (only if not default 10000km)
     if (filters.distance < 10000) {
       final locationName = userProfile?.locationName ?? 'Nearby';
       if (chips.isNotEmpty) chips.add(SizedBox(width: 8.w));
@@ -59,7 +56,6 @@ class ActiveFiltersList extends ConsumerWidget {
       );
     }
 
-    // Gender chip (only if not default 'Non-binary')
     if (filters.gender != 'Non-binary') {
       if (chips.isNotEmpty) chips.add(SizedBox(width: 8.w));
       chips.add(

@@ -7,7 +7,6 @@ class ConnectionRequest {
   final String status;
   final DateTime createdAt;
   
-  // Optional relations
   final ProfileModel? sender;
   final ProfileModel? receiver;
 

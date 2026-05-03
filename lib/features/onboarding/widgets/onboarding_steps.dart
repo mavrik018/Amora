@@ -198,9 +198,7 @@ class _OptionSelector extends StatelessWidget {
           child: GestureDetector(
             onTap: () => onSelected(option),
             child: Container(
-              margin: EdgeInsets.only(
-                right: option != options.last ? 8.w : 0,
-              ),
+              margin: EdgeInsets.only(right: option != options.last ? 8.w : 0),
               padding: EdgeInsets.symmetric(vertical: 14.h),
               decoration: BoxDecoration(
                 color: isSelected
@@ -218,7 +216,9 @@ class _OptionSelector extends StatelessWidget {
                 textAlign: TextAlign.center,
                 style: theme.textTheme.bodyMedium?.copyWith(
                   fontWeight: FontWeight.w600,
-                  color: isSelected ? Colors.white : theme.colorScheme.onSurface,
+                  color: isSelected
+                      ? Colors.white
+                      : theme.colorScheme.onSurface,
                 ),
               ),
             ),
@@ -403,9 +403,6 @@ class PersonalizationStep extends ConsumerWidget {
   }
 }
 
-// ─────────────────────────────────────────────
-// Step 4: Media
-// ─────────────────────────────────────────────
 class MediaStep extends ConsumerWidget {
   const MediaStep({super.key});
 
@@ -580,9 +577,6 @@ class MediaStep extends ConsumerWidget {
   }
 }
 
-// ─────────────────────────────────────────────
-// Shared info note widget
-// ─────────────────────────────────────────────
 class _InfoNote extends StatelessWidget {
   final IconData icon;
   final String text;

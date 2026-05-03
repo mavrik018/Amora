@@ -51,4 +51,21 @@ class SupabaseService {
       (response as List).map((x) => ProfileModel.fromJson(x)),
     );
   }
+
+  Future<List<String>> getConnectedUserIds() async {
+    final userID = user?.id;
+    if (userID == null) return [];
+
+    final response = await client
+        .from('connections')
+        .select('sender_id, receiver_id')
+        .or('sender_id.eq.$userID,receiver_id.eq.$userID');
+
+    final Set<String> ids = {};
+    for (var row in response as List) {
+      if (row['sender_id'] != userID) ids.add(row['sender_id']);
+      if (row['receiver_id'] != userID) ids.add(row['receiver_id']);
+    }
+    return ids.toList();
+  }
 }

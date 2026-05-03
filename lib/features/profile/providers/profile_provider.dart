@@ -9,7 +9,6 @@ final profileRepositoryProvider = Provider<ProfileRepository>((ref) {
 });
 
 final userProfileProvider = FutureProvider<ProfileModel?>((ref) async {
-  // This ensures the provider re-runs whenever the auth state changes (login/logout)
   ref.watch(authStateProvider);
   
   final repository = ref.watch(profileRepositoryProvider);

@@ -33,16 +33,7 @@ class HomeScreen extends ConsumerWidget {
                           style: Theme.of(context).textTheme.bodyLarge
                               ?.copyWith(
                                 fontWeight: FontWeight.w700,
-                                letterSpacing: -0.5,
-                              ),
-                        ),
-                        SizedBox(height: 4.h),
-                        Text(
-                          "Curated just for you",
-                          style: Theme.of(context).textTheme.bodySmall
-                              ?.copyWith(
-                                color: Colors.grey.shade500,
-                                fontWeight: FontWeight.w400,
+                                letterSpacing: 0,
                               ),
                         ),
                       ],
@@ -51,29 +42,6 @@ class HomeScreen extends ConsumerWidget {
                   ],
                 ),
               ),
-              //SizedBox(height: 16.h),
-              // Padding(
-              //   padding: EdgeInsets.symmetric(horizontal: 20.w),
-              //   child: Container(
-              //     padding: EdgeInsets.symmetric(
-              //       horizontal: 20.w,
-              //       vertical: 10.h,
-              //     ),
-              //     decoration: BoxDecoration(
-              //       color: Theme.of(context).primaryColor,
-              //       borderRadius: BorderRadius.circular(20.r),
-              //       border: null,
-              //     ),
-              //     child: Text(
-              //       'For You',
-              //       style: TextStyle(
-              //         color: Colors.white,
-              //         fontWeight: FontWeight.w600,
-              //         fontSize: 14.sp,
-              //       ),
-              //     ),
-              //   ),
-              // ),
               SizedBox(height: 16.h),
               bestMatchAsync.when(
                 data: (profile) => profile != null

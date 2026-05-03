@@ -24,7 +24,6 @@ class SignUpScreen extends StatelessWidget {
                 ),
               ),
               20.verticalSpace,
-              // Hero Image
               Container(
                 height: 250.h,
                 width: double.infinity,
@@ -44,7 +43,6 @@ class SignUpScreen extends StatelessWidget {
                 ),
               ),
               20.verticalSpace,
-              // Title
               Text(
                 'Create Account',
                 style: Theme.of(context).textTheme.headlineMedium,
@@ -80,7 +78,6 @@ class SignUpScreen extends StatelessWidget {
                 isPassword: true,
               ),
               30.verticalSpace,
-              // Sign Up Button
               ElevatedButton(
                 onPressed: () {},
                 style: Theme.of(context).elevatedButtonTheme.style,
@@ -93,7 +90,6 @@ class SignUpScreen extends StatelessWidget {
                 ),
               ),
               30.verticalSpace,
-              // Divider
               Row(
                 children: [
                   Expanded(child: Divider(color: Colors.grey[300])),
@@ -111,7 +107,6 @@ class SignUpScreen extends StatelessWidget {
                 ],
               ),
               30.verticalSpace,
-              // Social Sign Up
               BuildSocialButton(
                 label: 'Google',
                 icon: Icons.g_mobiledata,
@@ -119,7 +114,6 @@ class SignUpScreen extends StatelessWidget {
                 textColor: AppColors.textPrimary,
               ),
               20.verticalSpace,
-              // Login Link
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [

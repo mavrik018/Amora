@@ -1,15 +1,18 @@
 import 'package:amora/core/constants/colors.dart';
+import 'package:amora/features/discover/providers/profiles.dart';
+import 'package:amora/features/profile/providers/block_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:amora/shared/widgets/profile_page.dart';
 import '../../profile/models/profile_model.dart';
 
-class ProfileCard extends StatelessWidget {
+class ProfileCard extends ConsumerWidget {
   final ProfileModel profile;
   const ProfileCard({super.key, required this.profile});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return GestureDetector(
       onTap: () {
         Navigator.push(
@@ -46,7 +49,6 @@ class ProfileCard extends StatelessWidget {
                           : Container(color: Colors.grey.shade400),
                     ),
                   ),
-                  // Compatibility Score
                   Positioned(
                     top: 16.h,
                     left: 16.w,
@@ -79,7 +81,25 @@ class ProfileCard extends StatelessWidget {
                       ),
                     ),
                   ),
-                  // Profile Info
+                  Positioned(
+                    top: 16.h,
+                    right: 16.w,
+                    child: GestureDetector(
+                      onTap: () => _showSkipConfirmation(context, ref),
+                      child: Container(
+                        padding: EdgeInsets.all(8.w),
+                        decoration: BoxDecoration(
+                          color: Colors.black.withOpacity(0.5),
+                          shape: BoxShape.circle,
+                        ),
+                        child: Icon(
+                          Icons.close,
+                          color: Colors.white,
+                          size: 20.w,
+                        ),
+                      ),
+                    ),
+                  ),
                   Positioned(
                     bottom: 0,
                     left: 0,
@@ -100,7 +120,6 @@ class ProfileCard extends StatelessWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          // Name, Age, Verified
                           Row(
                             children: [
                               Text(
@@ -120,7 +139,6 @@ class ProfileCard extends StatelessWidget {
                             ],
                           ),
                           SizedBox(height: 8.h),
-                          // Mood Status
                           Container(
                             padding: EdgeInsets.symmetric(
                               horizontal: 12.w,
@@ -139,7 +157,6 @@ class ProfileCard extends StatelessWidget {
                             ),
                           ),
                           SizedBox(height: 12.h),
-                          // Interest Tags
                           Row(
                             children: profile.interests
                                 .take(3)
@@ -222,6 +239,35 @@ class ProfileCard extends StatelessWidget {
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  void _showSkipConfirmation(BuildContext context, WidgetRef ref) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Skip this profile?'),
+        content: Text('We won\'t show ${profile.fullName} to you anymore.'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () async {
+              Navigator.pop(context);
+              await ref.read(blockRepositoryProvider).blockUser(profile.id);
+              if (context.mounted) {
+                ref.invalidate(otherProfilesProvider);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text('${profile.fullName} hidden')),
+                );
+              }
+            },
+            child: const Text('Skip', style: TextStyle(color: Colors.red)),
+          ),
+        ],
       ),
     );
   }

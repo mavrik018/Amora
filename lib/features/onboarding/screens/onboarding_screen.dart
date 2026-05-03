@@ -73,7 +73,6 @@ class OnboardingScreen extends HookConsumerWidget {
       body: SafeArea(
         child: Column(
           children: [
-            // ── Segmented step dots ──────────────────────────
             Padding(
               padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 20.h),
               child: Row(
@@ -105,7 +104,6 @@ class OnboardingScreen extends HookConsumerWidget {
 
             12.verticalSpace,
 
-            // ── Scrollable step content ──────────────────────
             Expanded(
               child: SingleChildScrollView(
                 padding: EdgeInsets.symmetric(horizontal: 24.w),
@@ -113,7 +111,6 @@ class OnboardingScreen extends HookConsumerWidget {
               ),
             ),
 
-            // ── Error message ────────────────────────────────
             if (state.errorMessage != null)
               Padding(
                 padding: EdgeInsets.fromLTRB(24.w, 0, 24.w, 8.h),

@@ -80,7 +80,7 @@ class _AudioBioEditorState extends State<AudioBioEditor> {
       setState(() {
         _isRecording = false;
         _localAudioPath = recordedPath;
-        _audioBioUrl = null; // Clear existing URL if we have a new recording
+        _audioBioUrl = null;
       });
       widget.onAudioChanged(_localAudioPath);
     } catch (e) {

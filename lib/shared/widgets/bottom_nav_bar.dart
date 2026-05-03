@@ -1,3 +1,4 @@
+import 'package:amora/features/chat/screens/chat_list_screen.dart';
 import 'package:amora/features/profile/screens/user_profile_view.dart';
 import 'package:amora/shared/widgets/current_tab_provider.dart';
 import 'package:flutter/material.dart';
@@ -5,23 +6,18 @@ import 'package:amora/features/home/screens/home_screen.dart';
 import 'package:amora/features/discover/screens/discover_screen.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class BottomNavBar extends ConsumerStatefulWidget {
+class BottomNavBar extends ConsumerWidget {
   const BottomNavBar({super.key});
 
-  @override
-  ConsumerState<BottomNavBar> createState() => _BottomNavBarState();
-}
-
-class _BottomNavBarState extends ConsumerState<BottomNavBar> {
   final List<Widget> _screens = const [
     HomeScreen(),
     DiscoverScreen(),
-    Center(child: Text('Chat Screen')),
+    ChatListScreen(),
     UserProfileView(),
   ];
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final currentIndex = ref.watch(bottomNavIndexProvider);
     return Scaffold(
       body: IndexedStack(index: currentIndex, children: _screens),

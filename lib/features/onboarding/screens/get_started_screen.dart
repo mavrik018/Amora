@@ -1,4 +1,3 @@
-// Get Started screen
 import 'package:amora/features/auth/screens/login_screen.dart';
 import 'package:amora/features/onboarding/widgets/cta_button.dart';
 import 'package:amora/features/onboarding/widgets/profile_card.dart';

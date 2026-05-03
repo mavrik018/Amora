@@ -71,7 +71,6 @@ class DiscoverGridCard extends StatelessWidget {
                 ),
               ),
             ),
-            // Heart Rating / Compatibility
             Positioned(
               top: 12.h,
               left: 12.w,

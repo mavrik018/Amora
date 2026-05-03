@@ -19,7 +19,6 @@ class OnboardingNotifier extends StateNotifier<OnboardingState> {
     bool serviceEnabled;
     LocationPermission permission;
 
-    // 1. Check if location services are enabled
     serviceEnabled = await Geolocator.isLocationServiceEnabled();
     if (!serviceEnabled) {
       state = state.copyWith(
@@ -29,7 +28,6 @@ class OnboardingNotifier extends StateNotifier<OnboardingState> {
       return;
     }
 
-    // 2. Request permission
     permission = await Geolocator.checkPermission();
     if (permission == LocationPermission.denied) {
       permission = await Geolocator.requestPermission();
@@ -57,7 +55,7 @@ class OnboardingNotifier extends StateNotifier<OnboardingState> {
       state = state.copyWith(
         latitude: position.latitude,
         longitude: position.longitude,
-        errorMessage: null, // Clear errors on success
+        errorMessage: null,
       );
     } catch (e) {
       state = state.copyWith(
@@ -156,7 +154,6 @@ class OnboardingNotifier extends StateNotifier<OnboardingState> {
         final userId = response.user!.id;
         final List<String> uploadedPhotoUrls = [];
 
-        // Upload photos
         for (String photoPath in state.photos) {
           final file = File(photoPath);
           final fileName =
@@ -169,7 +166,6 @@ class OnboardingNotifier extends StateNotifier<OnboardingState> {
           uploadedPhotoUrls.add(publicUrl);
         }
 
-        // Upload audio bio if exists
         String? uploadedAudioUrl;
         if (state.audioBioPath != null && state.audioBioPath!.isNotEmpty) {
           final file = File(state.audioBioPath!);

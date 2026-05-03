@@ -17,6 +17,14 @@ class _ChatThreadScreenState extends ConsumerState<ChatThreadScreen> {
   final _messageController = TextEditingController();
 
   @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(chatProvider).markConversationAsRead(widget.otherProfile.id);
+    });
+  }
+
+  @override
   void dispose() {
     _messageController.dispose();
     super.dispose();
@@ -25,7 +33,7 @@ class _ChatThreadScreenState extends ConsumerState<ChatThreadScreen> {
   void _sendMessage() {
     final text = _messageController.text.trim();
     if (text.isEmpty) return;
-    
+
     ref.read(chatProvider).sendMessage(widget.otherProfile.id, text);
     _messageController.clear();
   }
@@ -33,7 +41,21 @@ class _ChatThreadScreenState extends ConsumerState<ChatThreadScreen> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final chatStreamAsync = ref.watch(chatStreamProvider(widget.otherProfile.id));
+
+    ref.listen(chatStreamProvider(widget.otherProfile.id), (previous, next) {
+      if (next.hasValue) {
+        final messages = next.value!;
+        if (messages.any(
+          (m) => m.senderId == widget.otherProfile.id && !m.isRead,
+        )) {
+          ref.read(chatProvider).markConversationAsRead(widget.otherProfile.id);
+        }
+      }
+    });
+
+    final chatStreamAsync = ref.watch(
+      chatStreamProvider(widget.otherProfile.id),
+    );
     final myId = Supabase.instance.client.auth.currentUser!.id;
 
     return Scaffold(
@@ -42,10 +64,12 @@ class _ChatThreadScreenState extends ConsumerState<ChatThreadScreen> {
           children: [
             CircleAvatar(
               radius: 16.r,
-              backgroundImage: widget.otherProfile.photos.isNotEmpty 
-                  ? NetworkImage(widget.otherProfile.photos.first) 
+              backgroundImage: widget.otherProfile.photos.isNotEmpty
+                  ? NetworkImage(widget.otherProfile.photos.first)
                   : null,
-              child: widget.otherProfile.photos.isNotEmpty ? null : const Icon(Icons.person, size: 16),
+              child: widget.otherProfile.photos.isNotEmpty
+                  ? null
+                  : const Icon(Icons.person, size: 16),
             ),
             SizedBox(width: 12.w),
             Text(widget.otherProfile.fullName),
@@ -61,18 +85,28 @@ class _ChatThreadScreenState extends ConsumerState<ChatThreadScreen> {
                   return const Center(child: Text('Say hi!'));
                 }
                 return ListView.builder(
-                  reverse: false,
+                  reverse: true,
                   itemCount: messages.length,
                   itemBuilder: (context, index) {
                     final msg = messages[index];
                     final isMe = msg.senderId == myId;
                     return Align(
-                      alignment: isMe ? Alignment.centerRight : Alignment.centerLeft,
+                      alignment: isMe
+                          ? Alignment.centerRight
+                          : Alignment.centerLeft,
                       child: Container(
-                        margin: EdgeInsets.symmetric(horizontal: 12.w, vertical: 4.h),
-                        padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 10.h),
+                        margin: EdgeInsets.symmetric(
+                          horizontal: 12.w,
+                          vertical: 4.h,
+                        ),
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 16.w,
+                          vertical: 10.h,
+                        ),
                         decoration: BoxDecoration(
-                          color: isMe ? theme.primaryColor : Colors.grey.shade200,
+                          color: isMe
+                              ? theme.primaryColor
+                              : Colors.grey.shade200,
                           borderRadius: BorderRadius.circular(20.r).copyWith(
                             bottomRight: isMe ? const Radius.circular(0) : null,
                             bottomLeft: !isMe ? const Radius.circular(0) : null,
@@ -110,7 +144,10 @@ class _ChatThreadScreenState extends ConsumerState<ChatThreadScreen> {
                         ),
                         filled: true,
                         fillColor: Colors.grey.shade200,
-                        contentPadding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 12.h),
+                        contentPadding: EdgeInsets.symmetric(
+                          horizontal: 20.w,
+                          vertical: 12.h,
+                        ),
                       ),
                     ),
                   ),

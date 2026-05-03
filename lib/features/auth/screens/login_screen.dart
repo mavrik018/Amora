@@ -1,4 +1,5 @@
 import 'package:amora/core/widgets/text_field.dart';
+import 'package:amora/core/widgets/social_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -44,7 +45,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       );
 
       if (mounted) {
-        // Save login state safely
         final user = supabase.auth.currentUser;
         if (user != null) {
           await AuthService.persistLogin(user.id);
@@ -91,7 +91,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 ),
 
                 20.verticalSpace,
-                // Welcome Text
                 Text(
                   'Welcome Back',
                   style: Theme.of(context).textTheme.headlineMedium,
@@ -161,7 +160,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   onChanged: (val) => _password = val,
                 ),
                 10.verticalSpace,
-                // Forgot Password
                 Align(
                   alignment: Alignment.centerRight,
                   child: TextButton(
@@ -176,7 +174,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   ),
                 ),
                 20.verticalSpace,
-                // Login Button
                 ElevatedButton(
                   onPressed: _isLoading ? null : _handleLogin,
                   style: Theme.of(context).elevatedButtonTheme.style,
@@ -199,7 +196,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         ),
                 ),
                 30.verticalSpace,
-                // Divider
                 Row(
                   children: [
                     Expanded(child: Divider(color: Colors.grey[300])),
@@ -218,15 +214,14 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 ),
                 30.verticalSpace,
 
-                buildSocialButton(
+                BuildSocialButton(
                   label: 'Google',
-                  icon: Icons.g_mobiledata, // Placeholder for Google logo
+                  icon: Icons.g_mobiledata,
                   color: Colors.white,
                   textColor: AppColors.textPrimary,
                 ),
 
                 30.verticalSpace,
-                // Sign Up Link
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -262,39 +257,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             ),
           ),
         ),
-      ),
-    );
-  }
-
-  Widget buildSocialButton({
-    required String label,
-    required IconData icon,
-    required Color color,
-    required Color textColor,
-  }) {
-    return Container(
-      padding: EdgeInsets.symmetric(vertical: 12.h),
-      decoration: BoxDecoration(
-        color: color,
-        borderRadius: BorderRadius.circular(15.r),
-        border: color == Colors.white
-            ? Border.all(color: Colors.grey[300]!)
-            : null,
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(icon, color: textColor, size: 24.sp),
-          8.horizontalSpace,
-          Text(
-            label,
-            style: TextStyle(
-              color: textColor,
-              fontWeight: FontWeight.bold,
-              fontSize: 16.sp,
-            ),
-          ),
-        ],
       ),
     );
   }

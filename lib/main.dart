@@ -18,7 +18,6 @@ void main() async {
     anonKey: dotenv.env['SUPABASE_ANON_KEY'] ?? '',
   );
 
-  // Read the login state safely
   final bool isLoggedIn = await AuthService.isLoggedIn();
 
   runApp(

@@ -39,7 +39,6 @@ class ProfileHeaderInfo extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Name, Age, Verification and Intent
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -64,7 +63,6 @@ class ProfileHeaderInfo extends StatelessWidget {
                 ],
               ),
             ),
-            // Intent Badge
             Container(
               padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
               decoration: BoxDecoration(

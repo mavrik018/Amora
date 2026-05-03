@@ -21,7 +21,6 @@ class _ProfileAudioBioState extends State<ProfileAudioBio> {
     super.initState();
     _audioPlayer = AudioPlayer();
 
-    // Listen to player state
     _audioPlayer.onPlayerStateChanged.listen((state) {
       if (mounted) {
         setState(() {
@@ -30,7 +29,6 @@ class _ProfileAudioBioState extends State<ProfileAudioBio> {
       }
     });
 
-    // Listen to duration
     _audioPlayer.onDurationChanged.listen((newDuration) {
       if (mounted) {
         setState(() {
@@ -39,7 +37,6 @@ class _ProfileAudioBioState extends State<ProfileAudioBio> {
       }
     });
 
-    // Listen to position
     _audioPlayer.onPositionChanged.listen((newPosition) {
       if (mounted) {
         setState(() {

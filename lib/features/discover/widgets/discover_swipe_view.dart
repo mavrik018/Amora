@@ -111,7 +111,6 @@ class DiscoverSwipeCard extends StatelessWidget {
                 ),
               ),
             ),
-            // Details
             Positioned(
               bottom: 24.h,
               left: 20.w,
@@ -158,7 +157,6 @@ class DiscoverSwipeCard extends StatelessWidget {
                     ],
                   ),
                   SizedBox(height: 16.h),
-                  // Action Buttons removed to provide a common interface
                 ],
               ),
             ),
@@ -167,5 +165,4 @@ class DiscoverSwipeCard extends StatelessWidget {
       ),
     );
   }
-
 }

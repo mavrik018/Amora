@@ -29,7 +29,6 @@ class MoodRecommendations extends StatelessWidget {
       ),
       child: Stack(
         children: [
-          // Placeholder for the background
           Positioned.fill(
             child: ClipRRect(
               borderRadius: BorderRadius.circular(16.r),

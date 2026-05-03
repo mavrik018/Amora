@@ -100,7 +100,6 @@ class ProfileModel {
     };
 
     if (latitude != null && longitude != null) {
-      // PostGIS geography format: POINT(longitude latitude)
       map['location'] = 'POINT($longitude $latitude)';
     }
 
