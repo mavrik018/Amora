@@ -1,13 +1,11 @@
 import 'dart:math';
 import 'package:amora/features/onboarding/screens/get_started_screen.dart';
-import 'package:amora/features/onboarding/screens/onboarding_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:amora/core/constants/colors.dart';
 import 'package:amora/core/providers/supabase_provider.dart';
-import 'package:amora/features/auth/screens/login_screen.dart';
 import 'package:amora/features/profile/providers/profile_provider.dart';
 import 'package:amora/features/profile/screens/admin_screen.dart';
 import 'package:amora/shared/widgets/bottom_nav_bar.dart';
@@ -180,15 +178,20 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
       },
       loading: () {
         ref.listenManual(authStateProvider, (_, next) {
-          next.whenData((state) {
+          if (next is AsyncData) {
+            final state = next.value;
             if (_navigated || !mounted) return;
-            if (state.session != null) {
+            if (state != null && state.session != null) {
               _navigateToHome();
             } else {
               _navigated = true;
               _navigate(const GetStartedScreen());
             }
-          });
+          } else if (next is AsyncError) {
+            if (_navigated || !mounted) return;
+            _navigated = true;
+            _navigate(const GetStartedScreen());
+          }
         });
       },
       error: (_, __) {
@@ -237,7 +240,9 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
   @override
   Widget build(BuildContext context) {
     ref.listen(authStateProvider, (_, next) {
-      next.whenData((_) => _maybeNavigate());
+      if (next is AsyncData) {
+        _maybeNavigate();
+      }
     });
 
     return Scaffold(

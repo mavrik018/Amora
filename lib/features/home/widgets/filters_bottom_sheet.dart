@@ -46,7 +46,8 @@ class FiltersBottomSheet extends ConsumerWidget {
                   ),
                   TextButton(
                     onPressed: () {
-                      filterNotifier.reset();
+                      final defaults = ref.read(defaultDiscoveryFiltersProvider);
+                      filterNotifier.reset(defaults);
                     },
                     style: TextButton.styleFrom(
                       foregroundColor: AppColors.primary,

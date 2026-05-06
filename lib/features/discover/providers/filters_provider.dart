@@ -1,4 +1,6 @@
+import 'package:amora/features/profile/providers/profile_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
 
 class DiscoveryFilters {
@@ -34,7 +36,7 @@ class DiscoveryFilters {
 }
 
 class DiscoveryFiltersNotifier extends StateNotifier<DiscoveryFilters> {
-  DiscoveryFiltersNotifier() : super(const DiscoveryFilters());
+  DiscoveryFiltersNotifier(DiscoveryFilters initial) : super(initial);
 
   void setAgeRange(RangeValues range) {
     state = state.copyWith(minAge: range.start, maxAge: range.end);
@@ -52,12 +54,27 @@ class DiscoveryFiltersNotifier extends StateNotifier<DiscoveryFilters> {
     state = state.copyWith(verifiedOnly: verifiedOnly);
   }
 
-  void reset() {
-    state = const DiscoveryFilters();
+  void reset(DiscoveryFilters defaults) {
+    state = defaults;
   }
 }
 
+final defaultDiscoveryFiltersProvider = Provider<DiscoveryFilters>((ref) {
+  final userProfile = ref.watch(userProfileProvider).value;
+  String defaultGender = 'Non-binary';
+
+  if (userProfile != null) {
+    if (userProfile.interestedIn == 'Men') {
+      defaultGender = 'Man';
+    } else if (userProfile.interestedIn == 'Women') {
+      defaultGender = 'Woman';
+    }
+  }
+  return DiscoveryFilters(gender: defaultGender);
+});
+
 final discoveryFiltersProvider =
     StateNotifierProvider<DiscoveryFiltersNotifier, DiscoveryFilters>((ref) {
-      return DiscoveryFiltersNotifier();
+      final defaults = ref.watch(defaultDiscoveryFiltersProvider);
+      return DiscoveryFiltersNotifier(defaults);
     });

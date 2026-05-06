@@ -49,6 +49,7 @@ class _AdminReportCardState extends ConsumerState<AdminReportCard> {
           message: 'Report dismissed',
           type: SnackBarType.success,
         );
+        ref.invalidate(reportsStreamProvider);
       }
     } catch (e) {
       if (mounted) {

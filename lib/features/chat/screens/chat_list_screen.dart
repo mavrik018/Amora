@@ -1,10 +1,10 @@
+import 'package:amora/features/chat/widgets/request.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../providers/connection_provider.dart';
 import 'chat_thread_screen.dart';
-import 'package:amora/features/discover/providers/profiles.dart';
 import '../providers/chat_provider.dart';
 
 class ChatListScreen extends ConsumerWidget {
@@ -89,99 +89,7 @@ class ChatListScreen extends ConsumerWidget {
                         padding: EdgeInsets.symmetric(horizontal: 16.w),
                         itemCount: requests.length,
                         itemBuilder: (context, index) {
-                          final req = requests[index];
-                          final sender = req.sender;
-                          return Padding(
-                            padding: EdgeInsets.only(right: 12.w),
-                            child: Column(
-                              children: [
-                                Stack(
-                                  clipBehavior: Clip.none,
-                                  children: [
-                                    Container(
-                                      decoration: BoxDecoration(
-                                        shape: BoxShape.circle,
-                                        border: Border.all(
-                                          color: const Color(0xFFE8896A),
-                                          width: 2.5,
-                                        ),
-                                      ),
-                                      child: Padding(
-                                        padding: const EdgeInsets.all(2),
-                                        child: CircleAvatar(
-                                          radius: 30.r,
-                                          backgroundColor: const Color(
-                                            0xFFEDE8E3,
-                                          ),
-                                          backgroundImage:
-                                              sender?.photos.isNotEmpty == true
-                                              ? NetworkImage(
-                                                  sender!.photos.first,
-                                                )
-                                              : null,
-                                          child:
-                                              sender?.photos.isNotEmpty == true
-                                              ? null
-                                              : Icon(
-                                                  Icons.person_outline,
-                                                  color: const Color(
-                                                    0xFFAAAAAA,
-                                                  ),
-                                                  size: 22.r,
-                                                ),
-                                        ),
-                                      ),
-                                    ),
-                                    Positioned(
-                                      bottom: -2,
-                                      right: -2,
-                                      child: Row(
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          _ActionButton(
-                                            icon: Icons.check,
-                                            color: const Color(0xFF4CAF82),
-                                            onTap: () async {
-                                              await ref
-                                                  .read(connectionProvider)
-                                                  .acceptRequest(req.id);
-                                              ref.invalidate(
-                                                otherProfilesProvider,
-                                              );
-                                            },
-                                          ),
-                                          SizedBox(width: 2.w),
-                                          _ActionButton(
-                                            icon: Icons.close,
-                                            color: const Color(0xFFE57373),
-                                            onTap: () async {
-                                              await ref
-                                                  .read(connectionProvider)
-                                                  .rejectRequest(req.id);
-                                              ref.invalidate(
-                                                otherProfilesProvider,
-                                              );
-                                            },
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                SizedBox(height: 6.h),
-                                Text(
-                                  sender!.fullName.split(' ').first,
-                                  style: TextStyle(
-                                    fontSize: 11.sp,
-                                    fontWeight: FontWeight.w500,
-                                    color: const Color(0xFF3A3A3A),
-                                  ),
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                              ],
-                            ),
-                          );
+                          return ConnectionRequestItem(req: requests[index]);
                         },
                       ),
                     ),
@@ -468,41 +376,6 @@ class ChatListScreen extends ConsumerWidget {
 
           SliverToBoxAdapter(child: SizedBox(height: 24.h)),
         ],
-      ),
-    );
-  }
-}
-
-class _ActionButton extends StatelessWidget {
-  const _ActionButton({
-    required this.icon,
-    required this.color,
-    required this.onTap,
-  });
-
-  final IconData icon;
-  final Color color;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        width: 22,
-        height: 22,
-        decoration: BoxDecoration(
-          color: color,
-          shape: BoxShape.circle,
-          boxShadow: [
-            BoxShadow(
-              color: color.withOpacity(0.35),
-              blurRadius: 4,
-              offset: const Offset(0, 2),
-            ),
-          ],
-        ),
-        child: Icon(icon, color: Colors.white, size: 13),
       ),
     );
   }

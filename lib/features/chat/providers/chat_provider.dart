@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/legacy.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../models/message.dart';
 import '../../../core/providers/supabase_provider.dart';
@@ -16,6 +17,8 @@ final chatStreamProvider = StreamProvider.family<List<Message>, String>((
   final chatRepo = ref.watch(chatProvider);
   return chatRepo.getChatStream(receiverId);
 });
+
+final activeChatIdProvider = StateProvider<String?>((ref) => null);
 
 final unreadCountProvider = StreamProvider.family<int, String>((ref, senderId) {
   final myId = Supabase.instance.client.auth.currentUser?.id;

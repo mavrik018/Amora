@@ -2,6 +2,7 @@ import 'package:amora/core/providers/supabase_provider.dart';
 import 'package:amora/core/theme/app_theme.dart';
 import 'package:amora/features/auth/screens/login_screen.dart';
 import 'package:amora/features/splash/screens/splash_screen.dart';
+import 'package:amora/shared/widgets/notif_layer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -29,13 +30,14 @@ class MyApp extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     ref.listen(authStateProvider, (_, next) {
-      next.whenData((event) {
-        if (event.event == AuthChangeEvent.signedOut) {
+      if (next is AsyncData) {
+        final state = next.value;
+        if (state != null && state.event == AuthChangeEvent.signedOut) {
           navigatorKey.currentState?.pushAndRemoveUntil(
             PageRouteBuilder(
-              pageBuilder: (_, __, ___) => const LoginScreen(),
+              pageBuilder: (_, _, _) => const LoginScreen(),
               transitionDuration: const Duration(milliseconds: 400),
-              transitionsBuilder: (_, animation, __, child) => FadeTransition(
+              transitionsBuilder: (_, animation, _, child) => FadeTransition(
                 opacity: CurvedAnimation(
                   parent: animation,
                   curve: Curves.easeIn,
@@ -46,7 +48,7 @@ class MyApp extends ConsumerWidget {
             (route) => false,
           );
         }
-      });
+      }
     });
 
     return ScreenUtilInit(
@@ -58,6 +60,11 @@ class MyApp extends ConsumerWidget {
           debugShowCheckedModeBanner: false,
           theme: AppTheme.lightTheme,
           home: const SplashScreen(),
+          builder: (context, child) {
+            return Stack(
+              children: [if (child != null) child, const NotificationLayer()],
+            );
+          },
         );
       },
     );

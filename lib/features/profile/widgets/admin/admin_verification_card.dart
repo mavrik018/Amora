@@ -10,7 +10,8 @@ class AdminVerificationCard extends ConsumerStatefulWidget {
   const AdminVerificationCard({super.key, required this.request});
 
   @override
-  ConsumerState<AdminVerificationCard> createState() => _AdminVerificationCardState();
+  ConsumerState<AdminVerificationCard> createState() =>
+      _AdminVerificationCardState();
 }
 
 class _AdminVerificationCardState extends ConsumerState<AdminVerificationCard> {
@@ -19,13 +20,16 @@ class _AdminVerificationCardState extends ConsumerState<AdminVerificationCard> {
   Future<void> _handleApprove() async {
     setState(() => _isProcessing = true);
     try {
-      await ref.read(adminProvider).approveVerification(widget.request.id, widget.request.userId);
+      await ref
+          .read(adminProvider)
+          .approveVerification(widget.request.id, widget.request.userId);
       if (mounted) {
         CustomSnackBar.show(
           context,
           message: 'Verification approved!',
           type: SnackBarType.success,
         );
+        ref.invalidate(pendingVerificationsProvider);
       }
     } catch (e) {
       if (mounted) {
@@ -72,13 +76,16 @@ class _AdminVerificationCardState extends ConsumerState<AdminVerificationCard> {
     if (result != null && result.isNotEmpty) {
       setState(() => _isProcessing = true);
       try {
-        await ref.read(adminProvider).rejectVerification(widget.request.id, result);
+        await ref
+            .read(adminProvider)
+            .rejectVerification(widget.request.id, result);
         if (mounted) {
           CustomSnackBar.show(
             context,
             message: 'Verification rejected',
             type: SnackBarType.info,
           );
+          ref.invalidate(pendingVerificationsProvider);
         }
       } catch (e) {
         if (mounted) {
@@ -165,7 +172,8 @@ class _AdminVerificationCardState extends ConsumerState<AdminVerificationCard> {
             child: Image.network(
               widget.request.idImageUrl,
               fit: BoxFit.cover,
-              errorBuilder: (_, __, ___) => const Center(child: Icon(Icons.broken_image_outlined)),
+              errorBuilder: (_, __, ___) =>
+                  const Center(child: Icon(Icons.broken_image_outlined)),
             ),
           ),
           Padding(

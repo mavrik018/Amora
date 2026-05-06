@@ -20,6 +20,7 @@ class _ChatThreadScreenState extends ConsumerState<ChatThreadScreen> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(activeChatIdProvider.notifier).state = widget.otherProfile.id;
       ref.read(chatProvider).markConversationAsRead(widget.otherProfile.id);
     });
   }
@@ -27,6 +28,11 @@ class _ChatThreadScreenState extends ConsumerState<ChatThreadScreen> {
   @override
   void dispose() {
     _messageController.dispose();
+    Future.microtask(() {
+      if (mounted) {
+        ref.read(activeChatIdProvider.notifier).state = null;
+      }
+    });
     super.dispose();
   }
 
