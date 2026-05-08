@@ -113,9 +113,7 @@ class _AudioBioEditorState extends State<AudioBioEditor> {
       decoration: BoxDecoration(
         color: theme.colorScheme.primary.withOpacity(0.05),
         borderRadius: BorderRadius.circular(16.r),
-        border: Border.all(
-          color: theme.colorScheme.primary.withOpacity(0.1),
-        ),
+        border: Border.all(color: theme.colorScheme.primary.withOpacity(0.1)),
       ),
       child: Row(
         children: [
@@ -143,8 +141,8 @@ class _AudioBioEditorState extends State<AudioBioEditor> {
                   _isRecording
                       ? 'Recording...'
                       : (_localAudioPath != null || _audioBioUrl != null)
-                          ? 'Audio bio ready'
-                          : 'Record an audio bio',
+                      ? 'Audio bio ready'
+                      : 'Record an audio bio',
                   style: theme.textTheme.bodyMedium?.copyWith(
                     fontWeight: FontWeight.bold,
                   ),
@@ -160,7 +158,8 @@ class _AudioBioEditorState extends State<AudioBioEditor> {
               ],
             ),
           ),
-          if (!_isRecording && (_localAudioPath != null || _audioBioUrl != null))
+          if (!_isRecording &&
+              (_localAudioPath != null || _audioBioUrl != null))
             Row(
               children: [
                 IconButton(
@@ -178,10 +177,7 @@ class _AudioBioEditorState extends State<AudioBioEditor> {
                     });
                     widget.onAudioChanged(null);
                   },
-                  icon: const Icon(
-                    Icons.delete_outline,
-                    color: Colors.red,
-                  ),
+                  icon: const Icon(Icons.delete_outline, color: Colors.red),
                 ),
               ],
             ),
